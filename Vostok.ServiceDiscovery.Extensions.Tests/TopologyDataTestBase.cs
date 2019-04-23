@@ -15,7 +15,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests
         {
             Topology = Substitute.For<IServiceTopology>();
             TopologyData = new Dictionary<string, string>();
-            Topology.Data.Returns(TopologyData);
+            Topology.Properties.Returns(TopologyData);
         }
     }
 }

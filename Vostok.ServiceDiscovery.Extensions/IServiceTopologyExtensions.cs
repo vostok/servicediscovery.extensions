@@ -9,12 +9,12 @@ namespace Vostok.ServiceDiscovery.Extensions
     {
         public static Uri GetExternalUrl(this IServiceTopology topology)
         {
-            return topology.Data.TryGetValue(TopologyDataConstants.ExternalUrlField, out var value) && Uri.TryCreate(value, UriKind.Absolute, out var uri) ? uri : null;
+            return topology.Properties.TryGetValue(TopologyDataConstants.ExternalUrlField, out var value) && Uri.TryCreate(value, UriKind.Absolute, out var uri) ? uri : null;
         }
 
         public static IList<Uri> GetBlacklist(this IServiceTopology topology)
         {
-            if (!topology.Data.TryGetValue(TopologyDataConstants.BlacklistField, out var blacklist))
+            if (!topology.Properties.TryGetValue(TopologyDataConstants.BlacklistField, out var blacklist))
                 return new Uri[] {};
             return blacklist.Split(TopologyDataConstants.BlacklistItemSeparator[0]).ToParsedUriList();
         }
