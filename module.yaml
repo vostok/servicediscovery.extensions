@@ -7,6 +7,7 @@ notests *default:
 
   install:
     - Vostok.ServiceDiscovery.Extensions/bin/Release/netstandard2.0/Vostok.ServiceDiscovery.Extensions.dll
+    - module vostok.servicediscovery.abstractions
 
   deps:
     - vostok.servicediscovery.abstractions
