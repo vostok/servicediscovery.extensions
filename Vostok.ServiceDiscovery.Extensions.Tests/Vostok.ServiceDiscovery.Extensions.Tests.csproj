@@ -22,7 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Vostok.ServiceDiscovery.Abstractions, Version=0.0.1.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Vostok.ServiceDiscovery.Abstractions">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\vostok.servicediscovery.abstractions\Vostok.ServiceDiscovery.Abstractions\bin\Release\netstandard2.0\Vostok.ServiceDiscovery.Abstractions.dll</HintPath>
     </Reference>
   </ItemGroup>
