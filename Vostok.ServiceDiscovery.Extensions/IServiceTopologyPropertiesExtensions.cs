@@ -11,6 +11,8 @@ namespace Vostok.ServiceDiscovery.Extensions
     {
         public const string ExternalUrlProperty = "ExternalUrl";
         public const string BlacklistProperty = "Blacklist";
+        public const string WeightsProperty = "weights";
+        public const string WeightsVersionProperty = "weightsVersion";
 
         public const string BlacklistItemSeparator = "|";
 
@@ -25,6 +27,17 @@ namespace Vostok.ServiceDiscovery.Extensions
             => properties.TryGetValue(BlacklistProperty, out var value)
                 ? UrlParser.Parse(value.Split(BlacklistItemSeparator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
                 : Array.Empty<Uri>();
+
+        [CanBeNull]
+        public static ReplicaWeights GetReplicaWeights([NotNull] this IServiceTopologyProperties properties)
+        {
+            if (!properties.TryGetValue(WeightsVersionProperty, out var weightsVersion) ||
+                !properties.TryGetValue(WeightsProperty, out var weightsData) || 
+                !int.TryParse(weightsVersion, out var numericVersion) || numericVersion != 0)
+                return null;
+
+            return ReplicaWeightsSerializer.Deserialize(Convert.FromBase64String(weightsData));
+        }
 
         [NotNull]
         public static IServiceTopologyProperties SetExternalUrl([NotNull] this IServiceTopologyProperties properties, [NotNull] Uri externalUrl)

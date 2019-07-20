@@ -13,6 +13,7 @@ notests *default:
     - vostok.servicediscovery.abstractions
     - vostok.devtools
     - vostok.commons.helpers/src
+    - vostok.commons.binary/src
 
 full-build > notests:
   build:
