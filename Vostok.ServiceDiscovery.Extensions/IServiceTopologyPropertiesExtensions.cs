@@ -9,30 +9,23 @@ namespace Vostok.ServiceDiscovery.Extensions
     [PublicAPI]
     public static class IServiceTopologyPropertiesExtensions
     {
-        public const string ExternalUrlProperty = "ExternalUrl";
-        public const string BlacklistProperty = "Blacklist";
-        public const string WeightsProperty = "weights";
-        public const string WeightsVersionProperty = "weightsVersion";
-
-        public const string BlacklistItemSeparator = "|";
-
         [CanBeNull]
         public static Uri GetExternalUrl([NotNull] this IServiceTopologyProperties properties)
-            => properties.TryGetValue(ExternalUrlProperty, out var value)
+            => properties.TryGetValue(PropertyConstants.ExternalUrlProperty, out var value)
                 ? UrlParser.Parse(value)
                 : null;
 
         [NotNull]
         public static Uri[] GetBlacklist([NotNull] this IServiceTopologyProperties properties)
-            => properties.TryGetValue(BlacklistProperty, out var value)
-                ? UrlParser.Parse(value.Split(BlacklistItemSeparator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
+            => properties.TryGetValue(PropertyConstants.BlacklistProperty, out var value)
+                ? UrlParser.Parse(value.Split(PropertyConstants.BlacklistItemSeparator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
                 : Array.Empty<Uri>();
 
         [CanBeNull]
         public static ReplicaWeights GetReplicaWeights([NotNull] this IServiceTopologyProperties properties)
         {
-            if (!properties.TryGetValue(WeightsVersionProperty, out var weightsVersion) ||
-                !properties.TryGetValue(WeightsProperty, out var weightsData) || 
+            if (!properties.TryGetValue(PropertyConstants.WeightsVersionProperty, out var weightsVersion) ||
+                !properties.TryGetValue(PropertyConstants.WeightsProperty, out var weightsData) || 
                 !int.TryParse(weightsVersion, out var numericVersion) || numericVersion != 0)
                 return null;
 
@@ -41,18 +34,18 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         [NotNull]
         public static IServiceTopologyProperties SetExternalUrl([NotNull] this IServiceTopologyProperties properties, [NotNull] Uri externalUrl)
-            => properties.Set(ExternalUrlProperty, externalUrl.ToString());
+            => properties.Set(PropertyConstants.ExternalUrlProperty, externalUrl.ToString());
 
         [NotNull]
         public static IServiceTopologyProperties SetBlacklist([NotNull] this IServiceTopologyProperties properties, [NotNull] IEnumerable<Uri> blacklist)
-            => properties.Set(BlacklistProperty, string.Join(BlacklistItemSeparator, blacklist));
+            => properties.Set(PropertyConstants.BlacklistProperty, string.Join(PropertyConstants.BlacklistItemSeparator, blacklist));
 
         [NotNull]
         public static IServiceTopologyProperties RemoveExternalUrl([NotNull] this IServiceTopologyProperties properties)
-            => properties.Remove(ExternalUrlProperty);
+            => properties.Remove(PropertyConstants.ExternalUrlProperty);
 
         [NotNull]
         public static IServiceTopologyProperties RemoveBlacklist([NotNull] this IServiceTopologyProperties properties)
-            => properties.Remove(BlacklistProperty);
+            => properties.Remove(PropertyConstants.BlacklistProperty);
     }
 }
