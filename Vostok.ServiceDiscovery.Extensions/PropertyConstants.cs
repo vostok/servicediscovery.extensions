@@ -1,6 +1,6 @@
 namespace Vostok.ServiceDiscovery.Extensions
 {
-    public static class PropertyConstants
+    internal static class PropertyConstants
     {
         public const string ExternalUrlProperty = "ExternalUrl";
         public const string BlacklistProperty = "Blacklist";

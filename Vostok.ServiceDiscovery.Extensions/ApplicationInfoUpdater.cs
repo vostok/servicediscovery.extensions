@@ -5,7 +5,7 @@ using Vostok.ServiceDiscovery.Abstractions;
 
 namespace Vostok.ServiceDiscovery.Extensions
 {
-    public static class ApplicationInfoUpdater
+    internal static class ApplicationInfoUpdater
     {
         public static IApplicationInfoProperties AddToBlacklist(Uri[] add, IApplicationInfoProperties properties)
         {
