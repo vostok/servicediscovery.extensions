@@ -1,8 +1,8 @@
-## 0.1.2 (12-09-2019)
+## 0.1.3 (12-09-2019)
 
-Added extensions to add replicas to application blacklist (see `AddToBlacklist()`).
-Added extensions to remove replicas from application blacklist (see `RemoveFromBlacklist()`).
-Added extensions to set application external url (see `SetExternalUrl()`).
+Added extensions to add replicas to application blacklist (see `AddToBlacklistAsync()`).
+Added extensions to remove replicas from application blacklist (see `RemoveFromBlacklistAsync()`).
+Added extensions to set application external url (see `SetExternalUrlAsync()`).
 
 ## 0.1.1 (20-07-2019)
 
