@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Vostok.ServiceDiscovery.Extensions
+namespace Vostok.ServiceDiscovery.Extensions.Helpers
 {
     internal class ReplicaComparer : IEqualityComparer<Uri>
     {

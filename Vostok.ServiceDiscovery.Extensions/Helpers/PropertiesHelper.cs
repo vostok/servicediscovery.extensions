@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using Vostok.Commons.Helpers.Url;
+using Vostok.ServiceDiscovery.Abstractions;
 
-namespace Vostok.ServiceDiscovery.Extensions
+namespace Vostok.ServiceDiscovery.Extensions.Helpers
 {
     internal static class PropertiesHelper
     {
@@ -28,6 +30,28 @@ namespace Vostok.ServiceDiscovery.Extensions
                 return null;
 
             return ReplicaWeightsSerializer.Deserialize(Convert.FromBase64String(weightsData));
+        }
+
+        [Pure]
+        public static IApplicationInfoProperties AddToBlacklist(this IApplicationInfoProperties properties, Uri[] replicasToAdd)
+        {
+            var blacklist = new HashSet<Uri>(properties.GetBlacklist());
+            if (blacklist.IsSupersetOf(replicasToAdd))
+                return properties;
+
+            var newBlackList = blacklist.Concat(replicasToAdd);
+            return properties.SetBlacklist(newBlackList);
+        }
+
+        [Pure]
+        public static IApplicationInfoProperties RemoveFromBlacklist(this IApplicationInfoProperties properties, Uri[] replicasToRemove)
+        {
+            var blacklist = new HashSet<Uri>(properties.GetBlacklist());
+            if (!replicasToRemove.Intersect(blacklist).Any())
+                return properties;
+
+            blacklist.ExceptWith(replicasToRemove);
+            return properties.SetBlacklist(blacklist);
         }
     }
 }

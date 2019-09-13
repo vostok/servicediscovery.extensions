@@ -2,7 +2,7 @@ using System;
 using JetBrains.Annotations;
 using Vostok.Commons.Binary;
 
-namespace Vostok.ServiceDiscovery.Extensions
+namespace Vostok.ServiceDiscovery.Extensions.Helpers
 {
     internal static class ReplicaWeightsSerializer
     {

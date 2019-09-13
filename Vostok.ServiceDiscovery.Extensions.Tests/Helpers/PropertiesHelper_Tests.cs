@@ -4,11 +4,12 @@ using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using Vostok.ServiceDiscovery.Abstractions;
+using Vostok.ServiceDiscovery.Extensions.Helpers;
 
-namespace Vostok.ServiceDiscovery.Extensions.Tests
+namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
 {
     [TestFixture]
-    public class ApplicationInfoUpdater_Tests
+    public class PropertiesHelper_Tests
     {
         [Test]
         public void AddToBlacklist_should_add_blacklist()
@@ -18,10 +19,10 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests
             {
                 new Uri("http://replica:1/vostok"),
                 new Uri("http://replica:2/vostok"),
-                new Uri("http://replica:3/vostok"),
+                new Uri("http://replica:3/vostok")
             };
 
-            var updated = ApplicationInfoUpdater.AddToBlacklist(addReplicas, properties);
+            var updated = properties.AddToBlacklist(addReplicas);
 
             updated.GetBlacklist().Should().BeEquivalentTo(addReplicas);
         }
@@ -34,11 +35,12 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests
             {
                 new Uri("http://replica:1/vostok"),
                 new Uri("http://replica:2/vostok"),
-                new Uri("http://replica:3/vostok"),
+                new Uri("http://replica:3/vostok")
             };
-            var withBlacklist = ApplicationInfoUpdater.AddToBlacklist(addReplicas, properties);
 
-            var updated = ApplicationInfoUpdater.AddToBlacklist(addReplicas, withBlacklist);
+            var updated = properties
+                .AddToBlacklist(addReplicas)
+                .AddToBlacklist(addReplicas);
 
             updated.GetBlacklist().Should().BeEquivalentTo(addReplicas);
         }
@@ -51,17 +53,17 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests
             {
                 new Uri("http://replica:1/vostok"),
                 new Uri("http://replica:2/vostok"),
-                new Uri("http://replica:3/vostok"),
+                new Uri("http://replica:3/vostok")
             };
-            var withBlacklist = ApplicationInfoUpdater.AddToBlacklist(initReplicas, properties);
+            var withBlacklist = properties.AddToBlacklist(initReplicas);
             var updateReplicas = new[]
             {
                 new Uri("http://replica:4/vostok"),
                 new Uri("http://replica:5/vostok"),
-                new Uri("http://replica:6/vostok"),
+                new Uri("http://replica:6/vostok")
             };
 
-            var updated = ApplicationInfoUpdater.AddToBlacklist(updateReplicas, withBlacklist);
+            var updated = withBlacklist.AddToBlacklist(updateReplicas);
 
             updated.GetBlacklist().Should().BeEquivalentTo(initReplicas.Concat(updateReplicas));
         }
@@ -74,10 +76,10 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests
             {
                 new Uri("http://replica:1/vostok"),
                 new Uri("http://replica:2/vostok"),
-                new Uri("http://replica:3/vostok"),
+                new Uri("http://replica:3/vostok")
             };
 
-            var updated = ApplicationInfoUpdater.RemoveFromBlacklist(removeReplicas, properties);
+            var updated = properties.RemoveFromBlacklist(removeReplicas);
 
             updated.GetBlacklist().Should().BeEmpty();
         }
@@ -91,18 +93,18 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests
                 new Uri("http://replica:1/vostok"),
                 new Uri("http://replica:2/vostok"),
                 new Uri("http://replica:3/vostok"),
-                new Uri("http://replica:4/vostok"),
+                new Uri("http://replica:4/vostok")
             };
-            var withBlacklist = ApplicationInfoUpdater.AddToBlacklist(initReplicas, properties);
+            var withBlacklist = properties.AddToBlacklist(initReplicas);
 
             var removeReplicas = new[]
             {
                 new Uri("http://replica:1/vostok"),
                 new Uri("http://replica:2/vostok"),
-                new Uri("http://replica:3/vostok"),
+                new Uri("http://replica:3/vostok")
             };
 
-            var updated = ApplicationInfoUpdater.RemoveFromBlacklist(removeReplicas, withBlacklist);
+            var updated = withBlacklist.RemoveFromBlacklist(removeReplicas);
 
             updated.GetBlacklist().Should().BeEquivalentTo(new Uri("http://replica:4/vostok"));
         }
@@ -113,18 +115,18 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests
             var properties = new TestApplicationInfoProperties();
             var initReplicas = new[]
             {
-                new Uri("http://replica:4/vostok"),
+                new Uri("http://replica:4/vostok")
             };
-            var withBlacklist = ApplicationInfoUpdater.AddToBlacklist(initReplicas, properties);
+            var withBlacklist = properties.AddToBlacklist(initReplicas);
 
             var removeReplicas = new[]
             {
                 new Uri("http://replica:1/vostok"),
                 new Uri("http://replica:2/vostok"),
-                new Uri("http://replica:3/vostok"),
+                new Uri("http://replica:3/vostok")
             };
 
-            var updated = ApplicationInfoUpdater.RemoveFromBlacklist(removeReplicas, withBlacklist);
+            var updated = withBlacklist.RemoveFromBlacklist(removeReplicas);
 
             updated.GetBlacklist().Should().BeEquivalentTo(new Uri("http://replica:4/vostok"));
         }
