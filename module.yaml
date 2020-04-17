@@ -12,7 +12,7 @@ notests *default:
   deps:
     - vostok.servicediscovery.abstractions
     - vostok.devtools
-    - vostok.commons.helpers/src
+    - vostok.commons.helpers/src@move-replica-comparer
     - vostok.commons.binary/src
 
 full-build > notests:
