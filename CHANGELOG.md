@@ -1,3 +1,7 @@
+## 0.1.5 (20-04-2020):
+
+ReplicaComparer moved to Vostok.Commons.Helpers
+
 ## 0.1.4 (26-02-2020):
 
 ReplicaComparer is now public. It also considers only the first segment of URL hosts from now on.
