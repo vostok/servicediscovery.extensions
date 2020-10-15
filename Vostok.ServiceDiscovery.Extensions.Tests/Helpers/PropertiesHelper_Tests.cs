@@ -39,7 +39,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             };
 
             var updated = properties
-                .AddToBlacklist(addReplicas)
+                .AddToBlacklist(addReplicas.Take(2).ToArray())
                 .AddToBlacklist(addReplicas);
 
             updated.GetBlacklist().Should().BeEquivalentTo(addReplicas);

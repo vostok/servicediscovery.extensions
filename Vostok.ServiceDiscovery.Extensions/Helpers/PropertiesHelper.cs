@@ -39,8 +39,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             if (blacklist.IsSupersetOf(replicasToAdd))
                 return properties;
 
-            var newBlackList = blacklist.Concat(replicasToAdd);
-            return properties.SetBlacklist(newBlackList);
+            blacklist.UnionWith(replicasToAdd);
+            return properties.SetBlacklist(blacklist);
         }
 
         [Pure]
