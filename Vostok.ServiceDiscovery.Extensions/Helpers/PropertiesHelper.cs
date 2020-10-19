@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using Vostok.Commons.Helpers.Url;
 using Vostok.ServiceDiscovery.Abstractions;
+using Vostok.ServiceDiscovery.Abstractions.Models;
 
 namespace Vostok.ServiceDiscovery.Extensions.Helpers
 {
@@ -53,5 +54,49 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             blacklist.ExceptWith(replicasToRemove);
             return properties.SetBlacklist(blacklist);
         }
+        
+        [NotNull]
+        public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<ITag[], ITag[]> modifyTagsFunc)
+        {
+            var tags = properties.GetPersistentReplicaTags(replicaName);
+            var newTags = modifyTagsFunc(tags);
+            return properties.SetReplicaTags(replicaName, newTags);
+        }
+        
+        [NotNull]
+        public static IReadOnlyDictionary<string, ITag[]> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties)
+            => properties
+                .Where(x => x.Key.StartsWith(TagsParameterPrefix))
+                .ToDictionary(x => x.Key, x => ReplicaTagsHelpers.Deserialize(x.Value));
+
+        [NotNull]
+        public static ITag[] GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName)
+        {
+            return properties
+                .Where(x => x.Key.StartsWith(TagsParameterPrefix + replicaName + ":"))
+                .SelectMany(x => ReplicaTagsHelpers.Deserialize(x.Value))
+                .ToArray();
+        }
+
+        [NotNull]
+        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, ITag[] tags)
+        {
+            var propertyName = GetPersistentReplicaTagsPropertyKey(replicaName);
+            return tags.Length == 0 
+                ? properties.Remove(propertyName) 
+                : properties.Set(propertyName, ReplicaTagsHelpers.Serialize(tags));
+        }
+
+        [NotNull]
+        private static ITag[] GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName) 
+            => properties.TryGetValue(GetPersistentReplicaTagsPropertyKey(replicaName), out var value) 
+                ? ReplicaTagsHelpers.Deserialize(value) 
+                : Array.Empty<ITag>();
+
+        [NotNull]
+        private static string GetPersistentReplicaTagsPropertyKey(string replicaName)
+            => ReplicaTagsHelpers.GetReplicaTagsPropertyKey(replicaName + ":" + "persistent");
+        
+        private const string TagsParameterPrefix = "Tags:";
     }
 }

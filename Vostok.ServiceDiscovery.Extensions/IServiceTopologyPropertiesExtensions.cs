@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Vostok.ServiceDiscovery.Abstractions;
 using Vostok.ServiceDiscovery.Extensions.Helpers;
@@ -19,5 +20,13 @@ namespace Vostok.ServiceDiscovery.Extensions
         [CanBeNull]
         public static ReplicaWeights GetReplicaWeights([NotNull] this IServiceTopologyProperties properties)
             => PropertiesHelper.GetReplicaWeights(properties);
+
+        [NotNull]
+        public static ITag[] GetReplicaTags([NotNull] this IServiceTopologyProperties properties, string replicaName)
+            => PropertiesHelper.GetReplicaTags(properties, replicaName);
+
+        [NotNull]
+        public static IReadOnlyDictionary<string, ITag[]> GetTags([NotNull] this IServiceTopologyProperties properties)
+            => PropertiesHelper.GetTags(properties);
     }
 }
