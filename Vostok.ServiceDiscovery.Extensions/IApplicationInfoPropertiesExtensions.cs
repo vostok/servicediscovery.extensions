@@ -21,6 +21,14 @@ namespace Vostok.ServiceDiscovery.Extensions
         public static ReplicaWeights GetReplicaWeights([NotNull] this IApplicationInfoProperties properties)
             => PropertiesHelper.GetReplicaWeights(properties);
 
+        [NotNull]
+        public static ITag[] GetReplicaTags([NotNull] this IServiceTopologyProperties properties, string replicaName)
+            => PropertiesHelper.GetReplicaTags(properties, replicaName);
+
+        [NotNull]
+        public static IReadOnlyDictionary<string, ITag[]> GetTags([NotNull] this IServiceTopologyProperties properties)
+            => PropertiesHelper.GetTags(properties);
+
         [Pure]
         [NotNull]
         public static IApplicationInfoProperties SetExternalUrl([NotNull] this IApplicationInfoProperties properties, [NotNull] Uri externalUrl)
@@ -30,6 +38,11 @@ namespace Vostok.ServiceDiscovery.Extensions
         [NotNull]
         public static IApplicationInfoProperties SetBlacklist([NotNull] this IApplicationInfoProperties properties, [NotNull] IEnumerable<Uri> blacklist)
             => properties.Set(PropertyConstants.BlacklistProperty, string.Join(PropertyConstants.BlacklistItemSeparator, blacklist));
+
+        [Pure]
+        [NotNull]
+        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, ITag[] tags)
+            => PropertiesHelper.SetReplicaTags(properties, replicaName, tags);
 
         [Pure]
         [NotNull]
