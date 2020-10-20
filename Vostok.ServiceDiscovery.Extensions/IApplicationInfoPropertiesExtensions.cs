@@ -23,11 +23,11 @@ namespace Vostok.ServiceDiscovery.Extensions
             => PropertiesHelper.GetReplicaWeights(properties);
 
         [NotNull]
-        public static Tag[] GetReplicaTags([NotNull] this IServiceTopologyProperties properties, string replicaName)
+        public static TagCollection GetReplicaTags([NotNull] this IServiceTopologyProperties properties, string replicaName)
             => PropertiesHelper.GetReplicaTags(properties, replicaName);
 
         [NotNull]
-        public static IReadOnlyDictionary<string, Tag[]> GetTags([NotNull] this IServiceTopologyProperties properties)
+        public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IServiceTopologyProperties properties)
             => PropertiesHelper.GetTags(properties);
 
         [Pure]
@@ -42,7 +42,7 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         [Pure]
         [NotNull]
-        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Tag[] tags)
+        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, TagCollection tags)
             => PropertiesHelper.SetReplicaTags(properties, replicaName, tags);
 
         [Pure]

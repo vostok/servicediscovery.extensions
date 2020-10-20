@@ -56,47 +56,65 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         }
         
         [NotNull]
-        public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<Tag[], Tag[]> modifyTagsFunc)
+        public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
         {
             var tags = properties.GetPersistentReplicaTags(replicaName);
             var newTags = modifyTagsFunc(tags);
             return properties.SetReplicaTags(replicaName, newTags);
         }
-        
-        [NotNull]
-        public static IReadOnlyDictionary<string, Tag[]> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties)
-            => properties
-                .Where(x => x.Key.StartsWith(TagsParameterPrefix))
-                .ToDictionary(x => x.Key, x => ReplicaTagsHelpers.Deserialize(x.Value));
 
         [NotNull]
-        public static Tag[] GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName)
+        public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties)
         {
             return properties
-                .Where(x => x.Key.StartsWith(TagsParameterPrefix + replicaName + ":"))
-                .SelectMany(x => ReplicaTagsHelpers.Deserialize(x.Value))
-                .ToArray();
+                .Where(x => ReplicaTagsPropertyHelpers.IsTagsPropertyKey(x.Key))
+                .GroupBy(x => ReplicaTagsPropertyHelpers.GetTagPropertyReplicaName(x.Key), x => TagCollection.TryParse(x.Value, out var tags) ? tags : null)
+                .ToDictionary(x => x.Key, MergeTagCollections);
         }
 
         [NotNull]
-        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Tag[] tags)
+        public static TagCollection GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName)
+        {
+            var tagCollections = properties
+                .Where(x => ReplicaTagsPropertyHelpers.IsTagsPropertyKey(x.Key))
+                .Select(x => TagCollection.TryParse(x.Value, out var tags) ? tags : null);
+            
+            return MergeTagCollections(tagCollections);
+        }
+
+        [NotNull]
+        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, TagCollection tagCollection)
         {
             var propertyName = GetPersistentReplicaTagsPropertyKey(replicaName);
-            return tags.Length == 0 
-                ? properties.Remove(propertyName) 
-                : properties.Set(propertyName, ReplicaTagsHelpers.Serialize(tags));
+            return tagCollection.Any() 
+                ? properties.Set(propertyName, tagCollection.ToString()) 
+                : properties.Remove(propertyName);
         }
 
-        [NotNull]
-        private static Tag[] GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName) 
+        [CanBeNull]
+        private static TagCollection GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName) 
             => properties.TryGetValue(GetPersistentReplicaTagsPropertyKey(replicaName), out var value) 
-                ? ReplicaTagsHelpers.Deserialize(value) 
-                : Array.Empty<Tag>();
+                && TagCollection.TryParse(value, out var tagCollection)
+                ? tagCollection
+                : null;
 
         [NotNull]
         private static string GetPersistentReplicaTagsPropertyKey(string replicaName)
-            => ReplicaTagsHelpers.GetReplicaTagsPropertyKey(replicaName + ":" + "persistent");
+            => ReplicaTagsPropertyHelpers.GetReplicaTagsPropertyKey(replicaName, "persistent");
+
+        [Pure]
+        [NotNull]
+        private static TagCollection MergeTagCollections([NotNull] IEnumerable<TagCollection> collections)
+        {
+            return new TagCollection(
+                collections
+                    .Where(x => x != null)
+                    .SelectMany(x => x)
+                    .ToDictionary(x => x.Key, x => x.Value)
+                );
+        }
         
         private const string TagsParameterPrefix = "Tags:";
+        private const string TagsParameterValuesSeparator = ":";
     }
 }

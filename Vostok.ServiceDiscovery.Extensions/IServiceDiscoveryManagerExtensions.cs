@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Vostok.ServiceDiscovery.Abstractions;
@@ -12,7 +10,7 @@ namespace Vostok.ServiceDiscovery.Extensions
     [PublicAPI]
     public static class IServiceDiscoveryManagerExtensions
     {
-        public static async Task<bool> ModifyReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, Func<Tag[], Tag[]> modifyTagsFunc)
+        public static async Task<bool> ModifyReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
         {
             return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
                     environment,
@@ -63,21 +61,18 @@ namespace Vostok.ServiceDiscovery.Extensions
                 .ConfigureAwait(false);
         }        
         
-        private static Tag[] Add(Tag[] existTags, Tag[] newTags)
+        private static TagCollection Add(TagCollection existTags, Tag[] newTags)
         {
-            var hashSet = new HashSet<string>(newTags.Select(x => x.Key));
-            return existTags
-                .Where(x => !hashSet.Contains(x.Key))
-                .Concat(ReplicaTagsHelpers.Distinct(newTags))
-                .ToArray();
+            foreach (var newTag in newTags)
+                existTags[newTag.Key] = newTag.Value;
+            return existTags;
         }
 
-        private static Tag[] Remove(Tag[] existTags, string[] tagsToRemove)
+        private static TagCollection Remove(TagCollection existTags, string[] tagsToRemove)
         {
-            var hashSet = new HashSet<string>(tagsToRemove);
-            return existTags
-                .Where(x => !hashSet.Contains(x.Key))
-                .ToArray();
+            foreach (var tagToRemove in tagsToRemove)
+                existTags.Remove(tagToRemove);
+            return existTags;
         }
     }
 }
