@@ -12,7 +12,7 @@ namespace Vostok.ServiceDiscovery.Extensions
     [PublicAPI]
     public static class IServiceDiscoveryManagerExtensions
     {
-        public static async Task<bool> ModifyReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, Func<ITag[], ITag[]> modifyTagsFunc)
+        public static async Task<bool> ModifyReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, Func<Tag[], Tag[]> modifyTagsFunc)
         {
             return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
                     environment,
@@ -21,7 +21,7 @@ namespace Vostok.ServiceDiscovery.Extensions
                 .ConfigureAwait(false);
         }
 
-        public static async Task<bool> AddReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, params ITag[] tags)
+        public static async Task<bool> AddReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, params Tag[] tags)
             => await serviceDiscoveryManager.ModifyReplicaTags(environment, application, replicaName, t => Add(t, tags));
 
         public static async Task<bool> RemoveReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, params string[] tags)
@@ -54,7 +54,7 @@ namespace Vostok.ServiceDiscovery.Extensions
                 .ConfigureAwait(false);
         }
         
-        private static ITag[] Add(ITag[] existTags, ITag[] newTags)
+        private static Tag[] Add(Tag[] existTags, Tag[] newTags)
         {
             var hashSet = new HashSet<string>(newTags.Select(x => x.Key));
             return existTags
@@ -63,7 +63,7 @@ namespace Vostok.ServiceDiscovery.Extensions
                 .ToArray();
         }
 
-        private static ITag[] Remove(ITag[] existTags, string[] tagsToRemove)
+        private static Tag[] Remove(Tag[] existTags, string[] tagsToRemove)
         {
             var hashSet = new HashSet<string>(tagsToRemove);
             return existTags

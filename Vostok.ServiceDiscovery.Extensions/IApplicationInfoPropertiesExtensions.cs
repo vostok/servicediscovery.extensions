@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Vostok.ServiceDiscovery.Abstractions;
+using Vostok.ServiceDiscovery.Abstractions.Models;
 using Vostok.ServiceDiscovery.Extensions.Helpers;
 
 namespace Vostok.ServiceDiscovery.Extensions
@@ -22,11 +23,11 @@ namespace Vostok.ServiceDiscovery.Extensions
             => PropertiesHelper.GetReplicaWeights(properties);
 
         [NotNull]
-        public static ITag[] GetReplicaTags([NotNull] this IServiceTopologyProperties properties, string replicaName)
+        public static Tag[] GetReplicaTags([NotNull] this IServiceTopologyProperties properties, string replicaName)
             => PropertiesHelper.GetReplicaTags(properties, replicaName);
 
         [NotNull]
-        public static IReadOnlyDictionary<string, ITag[]> GetTags([NotNull] this IServiceTopologyProperties properties)
+        public static IReadOnlyDictionary<string, Tag[]> GetTags([NotNull] this IServiceTopologyProperties properties)
             => PropertiesHelper.GetTags(properties);
 
         [Pure]
@@ -41,7 +42,7 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         [Pure]
         [NotNull]
-        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, ITag[] tags)
+        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Tag[] tags)
             => PropertiesHelper.SetReplicaTags(properties, replicaName, tags);
 
         [Pure]
