@@ -56,7 +56,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         }
         
         [NotNull]
-        public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<ITag[], ITag[]> modifyTagsFunc)
+        public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<Tag[], Tag[]> modifyTagsFunc)
         {
             var tags = properties.GetPersistentReplicaTags(replicaName);
             var newTags = modifyTagsFunc(tags);
@@ -64,13 +64,13 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         }
         
         [NotNull]
-        public static IReadOnlyDictionary<string, ITag[]> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties)
+        public static IReadOnlyDictionary<string, Tag[]> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties)
             => properties
                 .Where(x => x.Key.StartsWith(TagsParameterPrefix))
                 .ToDictionary(x => x.Key, x => ReplicaTagsHelpers.Deserialize(x.Value));
 
         [NotNull]
-        public static ITag[] GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName)
+        public static Tag[] GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName)
         {
             return properties
                 .Where(x => x.Key.StartsWith(TagsParameterPrefix + replicaName + ":"))
@@ -79,7 +79,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         }
 
         [NotNull]
-        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, ITag[] tags)
+        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Tag[] tags)
         {
             var propertyName = GetPersistentReplicaTagsPropertyKey(replicaName);
             return tags.Length == 0 
@@ -88,10 +88,10 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         }
 
         [NotNull]
-        private static ITag[] GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName) 
+        private static Tag[] GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName) 
             => properties.TryGetValue(GetPersistentReplicaTagsPropertyKey(replicaName), out var value) 
                 ? ReplicaTagsHelpers.Deserialize(value) 
-                : Array.Empty<ITag>();
+                : Array.Empty<Tag>();
 
         [NotNull]
         private static string GetPersistentReplicaTagsPropertyKey(string replicaName)
