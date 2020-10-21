@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Vostok.ServiceDiscovery.Abstractions;
@@ -19,10 +20,10 @@ namespace Vostok.ServiceDiscovery.Extensions
                 .ConfigureAwait(false);
         }
 
-        public static async Task<bool> AddReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, params Tag[] tags)
+        public static async Task<bool> AddReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, IEnumerable<Tag> tags)
             => await serviceDiscoveryManager.ModifyReplicaTags(environment, application, replicaName, t => Add(t, tags));
 
-        public static async Task<bool> RemoveReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, params string[] tags)
+        public static async Task<bool> RemoveReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, IEnumerable<string> tags)
             => await serviceDiscoveryManager.ModifyReplicaTags(environment, application, replicaName, t => Remove(t, tags));
         
         public static async Task<bool> AddToBlacklistAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params Uri[] replicasToAdd)
@@ -61,14 +62,14 @@ namespace Vostok.ServiceDiscovery.Extensions
                 .ConfigureAwait(false);
         }        
         
-        private static TagCollection Add(TagCollection existTags, Tag[] newTags)
+        private static TagCollection Add(TagCollection existTags, IEnumerable<Tag> newTags)
         {
             foreach (var newTag in newTags)
                 existTags[newTag.Key] = newTag.Value;
             return existTags;
         }
 
-        private static TagCollection Remove(TagCollection existTags, string[] tagsToRemove)
+        private static TagCollection Remove(TagCollection existTags, IEnumerable<string> tagsToRemove)
         {
             foreach (var tagToRemove in tagsToRemove)
                 existTags.Remove(tagToRemove);
