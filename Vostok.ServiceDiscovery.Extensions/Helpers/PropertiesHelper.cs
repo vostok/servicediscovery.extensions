@@ -67,8 +67,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties)
         {
             return properties
-                .Where(x => ReplicaTagsPropertyHelpers.IsTagsPropertyKey(x.Key))
-                .GroupBy(x => ReplicaTagsPropertyHelpers.GetTagPropertyReplicaName(x.Key), x => TagCollection.TryParse(x.Value, out var tags) ? tags : null)
+                .Where(x => TagPropertyHelpers.IsTagsPropertyKey(x.Key))
+                .GroupBy(x => TagPropertyHelpers.ExtractReplicaName(x.Key), x => TagCollection.TryParse(x.Value, out var tags) ? tags : null)
                 .ToDictionary(x => x.Key, MergeTagCollections);
         }
 
@@ -76,7 +76,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         public static TagCollection GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName)
         {
             var tagCollections = properties
-                .Where(x => ReplicaTagsPropertyHelpers.IsTagsPropertyKey(x.Key))
+                .Where(x => TagPropertyHelpers.IsTagsPropertyKey(x.Key))
                 .Select(x => TagCollection.TryParse(x.Value, out var tags) ? tags : null);
             
             return MergeTagCollections(tagCollections);
@@ -100,7 +100,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
 
         [NotNull]
         private static string GetPersistentReplicaTagsPropertyKey(string replicaName)
-            => ReplicaTagsPropertyHelpers.GetReplicaTagsPropertyKey(replicaName, "persistent");
+            => TagPropertyHelpers.FormatName(replicaName, "persistent");
 
         [Pure]
         [NotNull]
