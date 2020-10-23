@@ -54,7 +54,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             blacklist.ExceptWith(replicasToRemove);
             return properties.SetBlacklist(blacklist);
         }
-        
+
         [Pure]
         [NotNull]
         public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
@@ -94,14 +94,14 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             var tagCollections = properties
                 .Where(x => TagPropertyHelpers.IsReplicaTagsPropertyKey(x.Key, replicaName))
                 .Select(x => TagCollection.TryParse(x.Value, out var tags) ? tags : null);
-            
+
             return MergeTagCollections(tagCollections);
         }
 
         [NotNull]
-        private static TagCollection GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName) 
-            => properties.TryGetValue(GetPersistentReplicaTagsPropertyKey(replicaName), out var value) 
-                && TagCollection.TryParse(value, out var tagCollection)
+        private static TagCollection GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
+            => properties.TryGetValue(GetPersistentReplicaTagsPropertyKey(replicaName), out var value)
+               && TagCollection.TryParse(value, out var tagCollection)
                 ? tagCollection
                 : new TagCollection();
 
@@ -118,9 +118,9 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                     .Where(x => x != null)
                     .SelectMany(x => x)
                     .ToDictionary(x => x.Key, x => x.Value)
-                );
+            );
         }
-        
+
         private static TagCollection AddTags(TagCollection existTags, TagCollection newTags)
         {
             if (newTags == null)
