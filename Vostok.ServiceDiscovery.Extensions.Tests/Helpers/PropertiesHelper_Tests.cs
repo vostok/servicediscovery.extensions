@@ -153,17 +153,19 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             properties = properties.AddReplicaTags(replica1, replica1Tags);
             properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
             properties.GetReplicaTags(replica2).Should().BeEquivalentTo(new TagCollection());
-            
+
             properties = properties.AddReplicaTags(replica2, replica2Tags);
             properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
             properties.GetReplicaTags(replica2).Should().BeEquivalentTo(replica2Tags);
 
-            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection>
-            {
-                {replica1, replica1Tags},
-                {replica2, replica2Tags},
-            });
-
+            properties.GetTags()
+                .Should()
+                .BeEquivalentTo(
+                    new Dictionary<string, TagCollection>
+                    {
+                        {replica1, replica1Tags},
+                        {replica2, replica2Tags}
+                    });
         }
 
         [Test]
@@ -183,7 +185,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             };
             var added = properties.AddReplicaTags(replica1, tagsToAdd);
             var updated = added.AddReplicaTags(replica1, tagsToUpdate);
-            updated.GetReplicaTags(replica1).Should().BeEquivalentTo(new TagCollection{{"tag1", "updatedValue"}, {"tag2", "value1"}, "tag3"});
+            updated.GetReplicaTags(replica1).Should().BeEquivalentTo(new TagCollection {{"tag1", "updatedValue"}, {"tag2", "value1"}, "tag3"});
         }
 
         [Test]
@@ -225,7 +227,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             properties = properties.AddReplicaTags(replica1, replica1Tags);
             properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag3", "tag1"});
             properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica1, new TagCollection {{"tag2", "value1"}}}});
-            
+
             properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag2"});
             properties.GetTags().Should().BeEmpty();
         }
