@@ -46,7 +46,7 @@ namespace Vostok.ServiceDiscovery.Extensions
                     properties => properties.ClearReplicaTags(replicaName))
                 .ConfigureAwait(false);
         }
-        
+
         public static async Task<bool> AddToBlacklistAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params Uri[] replicasToAdd)
         {
             return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
