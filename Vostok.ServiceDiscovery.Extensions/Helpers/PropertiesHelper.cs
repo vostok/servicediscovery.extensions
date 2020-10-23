@@ -55,13 +55,29 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             return properties.SetBlacklist(blacklist);
         }
         
+        [Pure]
         [NotNull]
         public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
         {
             var tags = properties.GetPersistentReplicaTags(replicaName);
-            var newTags = modifyTagsFunc(tags);
+            var newTags = modifyTagsFunc?.Invoke(tags);
             return properties.SetReplicaTags(replicaName, newTags);
         }
+
+        [Pure]
+        [NotNull]
+        public static IApplicationInfoProperties AddReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, TagCollection tags)
+            => ModifyReplicaTags(properties, replicaName, tc => AddTags(tc, tags));
+
+        [Pure]
+        [NotNull]
+        public static IApplicationInfoProperties RemoveReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, IEnumerable<string> tagKeysToRemove)
+            => ModifyReplicaTags(properties, replicaName, tc => RemoveTags(tc, tagKeysToRemove));
+
+        [Pure]
+        [NotNull]
+        public static IApplicationInfoProperties ClearReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName)
+            => properties.SetReplicaTags(replicaName, new TagCollection());
 
         [NotNull]
         public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties)
@@ -73,30 +89,21 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         }
 
         [NotNull]
-        public static TagCollection GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName)
+        public static TagCollection GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
         {
             var tagCollections = properties
-                .Where(x => TagPropertyHelpers.IsTagsPropertyKey(x.Key))
+                .Where(x => TagPropertyHelpers.IsReplicaTagsPropertyKey(x.Key, replicaName))
                 .Select(x => TagCollection.TryParse(x.Value, out var tags) ? tags : null);
             
             return MergeTagCollections(tagCollections);
         }
 
         [NotNull]
-        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, TagCollection tagCollection)
-        {
-            var propertyName = GetPersistentReplicaTagsPropertyKey(replicaName);
-            return tagCollection.Any() 
-                ? properties.Set(propertyName, tagCollection.ToString()) 
-                : properties.Remove(propertyName);
-        }
-
-        [CanBeNull]
-        private static TagCollection GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, string replicaName) 
+        private static TagCollection GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName) 
             => properties.TryGetValue(GetPersistentReplicaTagsPropertyKey(replicaName), out var value) 
                 && TagCollection.TryParse(value, out var tagCollection)
                 ? tagCollection
-                : null;
+                : new TagCollection();
 
         [NotNull]
         private static string GetPersistentReplicaTagsPropertyKey(string replicaName)
@@ -114,7 +121,22 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                 );
         }
         
-        private const string TagsParameterPrefix = "Tags:";
-        private const string TagsParameterValuesSeparator = ":";
+        private static TagCollection AddTags(TagCollection existTags, TagCollection newTags)
+        {
+            if (newTags == null)
+                return existTags;
+            foreach (var newTag in newTags)
+                existTags[newTag.Key] = newTag.Value;
+            return existTags;
+        }
+
+        private static TagCollection RemoveTags(TagCollection existTags, IEnumerable<string> tagKeysToRemove)
+        {
+            if (tagKeysToRemove == null)
+                return existTags;
+            foreach (var tagToRemove in tagKeysToRemove)
+                existTags.Remove(tagToRemove);
+            return existTags;
+        }
     }
 }

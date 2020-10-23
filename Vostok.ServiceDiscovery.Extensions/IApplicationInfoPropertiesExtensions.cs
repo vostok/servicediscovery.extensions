@@ -43,7 +43,9 @@ namespace Vostok.ServiceDiscovery.Extensions
         [Pure]
         [NotNull]
         public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, TagCollection tags)
-            => PropertiesHelper.SetReplicaTags(properties, replicaName, tags);
+            => tags.Count > 0 
+                ? properties.Set(GetPersistentReplicaTagsPropertyKey(replicaName), tags.ToString()) 
+                : properties.Remove(GetPersistentReplicaTagsPropertyKey(replicaName));
 
         [Pure]
         [NotNull]
@@ -54,5 +56,9 @@ namespace Vostok.ServiceDiscovery.Extensions
         [NotNull]
         public static IApplicationInfoProperties RemoveBlacklist([NotNull] this IApplicationInfoProperties properties)
             => properties.Remove(PropertyConstants.BlacklistProperty);
+        
+        [NotNull]
+        private static string GetPersistentReplicaTagsPropertyKey(string replicaName)
+            => TagPropertyHelpers.FormatName(replicaName, "persistent");
     }
 }
