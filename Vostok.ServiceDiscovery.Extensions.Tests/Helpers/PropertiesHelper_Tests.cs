@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using Vostok.ServiceDiscovery.Abstractions;
+using Vostok.ServiceDiscovery.Abstractions.Models;
 using Vostok.ServiceDiscovery.Extensions.Helpers;
 
 namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
@@ -129,6 +130,114 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             var updated = withBlacklist.RemoveFromBlacklist(removeReplicas);
 
             updated.GetBlacklist().Should().BeEquivalentTo(new Uri("http://replica:4/vostok"));
+        }
+
+        [Test]
+        public void AddTags_for_given_replica_should_update_property_tags()
+        {
+            IApplicationInfoProperties properties = new TestApplicationInfoProperties();
+            var replica1 = "replica1";
+            var replica2 = "replica2";
+            var replica1Tags = new TagCollection
+            {
+                {"tag1", "value1"},
+                {"tag2", "value1"},
+                "tag3"
+            };
+            var replica2Tags = new TagCollection
+            {
+                "tag4",
+                {"tag5", "value3"},
+                "tag6"
+            };
+            properties = properties.AddReplicaTags(replica1, replica1Tags);
+            properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
+            properties.GetReplicaTags(replica2).Should().BeEquivalentTo(new TagCollection());
+            
+            properties = properties.AddReplicaTags(replica2, replica2Tags);
+            properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
+            properties.GetReplicaTags(replica2).Should().BeEquivalentTo(replica2Tags);
+
+            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection>
+            {
+                {replica1, replica1Tags},
+                {replica2, replica2Tags},
+            });
+
+        }
+
+        [Test]
+        public void AddTags_should_update_duplicate_key_property_tags()
+        {
+            var properties = new TestApplicationInfoProperties();
+            var replica1 = "replica1";
+            var tagsToAdd = new TagCollection
+            {
+                {"tag1", "value1"},
+                {"tag2", "value1"},
+                "tag3"
+            };
+            var tagsToUpdate = new TagCollection
+            {
+                {"tag1", "updatedValue"}
+            };
+            var added = properties.AddReplicaTags(replica1, tagsToAdd);
+            var updated = added.AddReplicaTags(replica1, tagsToUpdate);
+            updated.GetReplicaTags(replica1).Should().BeEquivalentTo(new TagCollection{{"tag1", "updatedValue"}, {"tag2", "value1"}, "tag3"});
+        }
+
+        [Test]
+        public void RemoveTags_should_remove_given_replica_tags()
+        {
+            IApplicationInfoProperties properties = new TestApplicationInfoProperties();
+            var replica1 = "replica1";
+            var replica2 = "replica2";
+            var replica1Tags = new TagCollection
+            {
+                {"tag1", "value1"},
+                {"tag2", "value1"},
+                "tag3"
+            };
+            var replica2Tags = new TagCollection
+            {
+                "tag4",
+                {"tag5", "value3"},
+                "tag6"
+            };
+            properties = properties.AddReplicaTags(replica1, replica1Tags);
+            properties = properties.AddReplicaTags(replica2, replica2Tags);
+            properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag3", "tag1"});
+            properties.GetReplicaTags(replica1).Should().BeEquivalentTo(new TagCollection {{"tag2", "value1"}});
+            properties.GetReplicaTags(replica2).Should().BeEquivalentTo(replica2Tags);
+        }
+
+        [Test]
+        public void RemoveTags_then_remove_all_tags_should_remove_replica_property_key()
+        {
+            IApplicationInfoProperties properties = new TestApplicationInfoProperties();
+            var replica1 = "replica1";
+            var replica1Tags = new TagCollection
+            {
+                {"tag1", "value1"},
+                {"tag2", "value1"},
+                "tag3"
+            };
+            properties = properties.AddReplicaTags(replica1, replica1Tags);
+            properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag3", "tag1"});
+            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica1, new TagCollection {{"tag2", "value1"}}}});
+            
+            properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag2"});
+            properties.GetTags().Should().BeEmpty();
+        }
+
+        [Test]
+        public void RemoveTags_should_not_fail_with_empty_blacklist()
+        {
+            IApplicationInfoProperties properties = new TestApplicationInfoProperties();
+            var replica1 = "replica1";
+            properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag1", "tag2"});
+            properties.GetReplicaTags(replica1).Should().BeEmpty();
+            properties.GetTags().Should().BeEmpty();
         }
 
         public class TestApplicationInfoProperties : Dictionary<string, string>, IApplicationInfoProperties

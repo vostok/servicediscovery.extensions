@@ -21,10 +21,31 @@ namespace Vostok.ServiceDiscovery.Extensions
         }
 
         public static async Task<bool> AddReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, TagCollection tags)
-            => await serviceDiscoveryManager.ModifyReplicaTags(environment, application, replicaName, t => Add(t, tags));
+        {
+            return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
+                    environment,
+                    application,
+                    properties => properties.AddReplicaTags(replicaName, tags))
+                .ConfigureAwait(false);
+        }
 
         public static async Task<bool> RemoveReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, IEnumerable<string> tagKeysToRemove)
-            => await serviceDiscoveryManager.ModifyReplicaTags(environment, application, replicaName, t => Remove(t, tagKeysToRemove));
+        {
+            return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
+                    environment,
+                    application,
+                    properties => properties.RemoveReplicaTags(replicaName, tagKeysToRemove))
+                .ConfigureAwait(false);
+        }
+
+        public static async Task<bool> ClearReplicaTags(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName)
+        {
+            return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
+                    environment,
+                    application,
+                    properties => properties.ClearReplicaTags(replicaName))
+                .ConfigureAwait(false);
+        }
         
         public static async Task<bool> AddToBlacklistAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params Uri[] replicasToAdd)
         {
@@ -52,28 +73,14 @@ namespace Vostok.ServiceDiscovery.Extensions
                     properties => properties.SetExternalUrl(externalUrl))
                 .ConfigureAwait(false);
         }
-
-        public static async Task<bool> RemoveExternalUrlAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application)
+		
+		public static async Task<bool> RemoveExternalUrlAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application)
         {
             return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
                     environment,
                     application,
                     properties => properties.RemoveExternalUrl())
                 .ConfigureAwait(false);
-        }        
-        
-        private static TagCollection Add(TagCollection existTags, TagCollection newTags)
-        {
-            foreach (var newTag in newTags)
-                existTags[newTag.Key] = newTag.Value;
-            return existTags;
-        }
-
-        private static TagCollection Remove(TagCollection existTags, IEnumerable<string> tagKeysToRemove)
-        {
-            foreach (var tagToRemove in tagKeysToRemove)
-                existTags.Remove(tagToRemove);
-            return existTags;
         }
     }
 }
