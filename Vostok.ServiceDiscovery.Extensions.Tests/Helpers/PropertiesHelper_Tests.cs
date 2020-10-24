@@ -233,12 +233,36 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
         }
 
         [Test]
-        public void RemoveTags_should_not_fail_with_empty_blacklist()
+        public void RemoveTags_should_not_fail_with_empty_property_tags()
         {
             IApplicationInfoProperties properties = new TestApplicationInfoProperties();
             var replica1 = "replica1";
             properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag1", "tag2"});
             properties.GetReplicaTags(replica1).Should().BeEmpty();
+            properties.GetTags().Should().BeEmpty();
+        }
+
+        [Test]
+        public void ModifyTags_should_update_properties_with_empty_tags_if_func_is_null()
+        {
+            IApplicationInfoProperties properties = new TestApplicationInfoProperties();
+            var replica = "replica";
+            var replicaTags = new TagCollection {"tag4"};
+            properties = properties.AddReplicaTags(replica, replicaTags);
+            properties = properties.ModifyReplicaTags(replica, null);
+            properties.GetReplicaTags(replica).Should().BeEmpty();
+            properties.GetTags().Should().BeEmpty();
+        }
+
+        [Test]
+        public void ModifyTags_should_update_properties_with_empty_tags_if_func_returns_null()
+        {
+            IApplicationInfoProperties properties = new TestApplicationInfoProperties();
+            var replica = "replica";
+            var replicaTags = new TagCollection {"tag4"};
+            properties = properties.AddReplicaTags(replica, replicaTags);
+            properties = properties.ModifyReplicaTags(replica, tags => null);
+            properties.GetReplicaTags(replica).Should().BeEmpty();
             properties.GetTags().Should().BeEmpty();
         }
 
