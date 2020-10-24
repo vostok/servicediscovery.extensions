@@ -60,7 +60,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
         {
             var tags = properties.GetPersistentReplicaTags(replicaName);
-            var newTags = modifyTagsFunc?.Invoke(tags);
+            var newTags = modifyTagsFunc?.Invoke(tags) ?? new TagCollection();
             return properties.SetReplicaTags(replicaName, newTags);
         }
 
@@ -121,22 +121,22 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             );
         }
 
-        private static TagCollection AddTags(TagCollection existTags, TagCollection newTags)
+        private static TagCollection AddTags(TagCollection existingTags, TagCollection newTags)
         {
             if (newTags == null)
-                return existTags;
+                return existingTags;
             foreach (var newTag in newTags)
-                existTags[newTag.Key] = newTag.Value;
-            return existTags;
+                existingTags[newTag.Key] = newTag.Value;
+            return existingTags;
         }
 
-        private static TagCollection RemoveTags(TagCollection existTags, IEnumerable<string> tagKeysToRemove)
+        private static TagCollection RemoveTags(TagCollection existingTags, IEnumerable<string> tagKeysToRemove)
         {
             if (tagKeysToRemove == null)
-                return existTags;
+                return existingTags;
             foreach (var tagToRemove in tagKeysToRemove)
-                existTags.Remove(tagToRemove);
-            return existTags;
+                existingTags.Remove(tagToRemove);
+            return existingTags;
         }
     }
 }
