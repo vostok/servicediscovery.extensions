@@ -7,5 +7,6 @@ namespace Vostok.ServiceDiscovery.Extensions
         public const string WeightsProperty = "weights";
         public const string WeightsVersionProperty = "weightsVersion";
         public const string BlacklistItemSeparator = "|";
+        public const string PersistentTagKindKey = "persistent";
     }
 }
