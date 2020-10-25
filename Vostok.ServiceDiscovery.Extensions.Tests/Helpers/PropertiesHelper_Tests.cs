@@ -169,6 +169,51 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
         }
 
         [Test]
+        public void AddTags_for_given_service_replica_should_correctly_parse_service_replicas()
+        {
+            IApplicationInfoProperties properties = new TestApplicationInfoProperties();
+            var replica1 = "http://localhost:1234/";
+            var replica2 = "replica2";
+            var replica1Tags = new TagCollection
+            {
+                {"tag1", "value1"},
+                {"tag2", "value1"},
+                "tag3"
+            };
+            var replica2Tags = new TagCollection
+            {
+                "tag4",
+                {"tag5", "value3"},
+                "tag6"
+            };
+            
+            properties = properties.AddReplicaTags(replica1, replica1Tags);
+            properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
+            properties.GetReplicaTags(replica2).Should().BeEquivalentTo(new TagCollection());
+
+            properties = properties.AddReplicaTags(replica2, replica2Tags);
+            properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
+            properties.GetReplicaTags(replica2).Should().BeEquivalentTo(replica2Tags);
+
+            properties.GetTags()
+                .Should()
+                .BeEquivalentTo(
+                    new Dictionary<string, TagCollection>
+                    {
+                        {replica1, replica1Tags},
+                        {replica2, replica2Tags},
+                    });
+
+            properties.GetServiceTags()
+                .Should()
+                .BeEquivalentTo(
+                    new Dictionary<Uri, TagCollection>
+                    {
+                        {new Uri(replica1), replica1Tags}
+                    });
+        }
+
+        [Test]
         public void AddTags_should_update_duplicate_key_property_tags()
         {
             var properties = new TestApplicationInfoProperties();
