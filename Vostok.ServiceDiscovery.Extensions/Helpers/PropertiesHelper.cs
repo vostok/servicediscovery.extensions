@@ -55,13 +55,28 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             return properties.SetBlacklist(blacklist);
         }
 
-        [Pure]
         [NotNull]
-        public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
+        public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties) 
+            => properties.GetTagsInternal(TagPropertyHelpers.ExtractReplicaName);
+
+        [NotNull]
+        public static IReadOnlyDictionary<Uri, TagCollection> GetServiceTags([NotNull] this IReadOnlyDictionary<string, string> properties)
+            => properties.GetTagsInternal(
+                key =>
+                {
+                    var replicaName = TagPropertyHelpers.ExtractReplicaName(key);
+                    return replicaName == null 
+                        ? null 
+                        : UrlParser.Parse(replicaName);
+                });
+
+        [NotNull]
+        public static TagCollection GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
         {
-            var tags = properties.GetPersistentReplicaTags(replicaName);
-            var newTags = modifyTagsFunc?.Invoke(tags) ?? new TagCollection();
-            return properties.SetReplicaTags(replicaName, newTags);
+            var tagCollections = properties
+                .Where(x => TagPropertyHelpers.IsReplicaTagsPropertyKey(x.Key, replicaName));
+
+            return MergeTagCollections(tagCollections);
         }
 
         [Pure]
@@ -73,29 +88,19 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         [NotNull]
         public static IApplicationInfoProperties RemoveReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, IEnumerable<string> tagKeysToRemove)
             => ModifyReplicaTags(properties, replicaName, tc => RemoveTags(tc, tagKeysToRemove));
-
+        
         [Pure]
         [NotNull]
         public static IApplicationInfoProperties ClearReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName)
             => properties.SetReplicaTags(replicaName, new TagCollection());
-
+        
+        [Pure]
         [NotNull]
-        public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties)
+        public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
         {
-            return properties
-                .Where(x => TagPropertyHelpers.IsTagsPropertyKey(x.Key))
-                .GroupBy(x => TagPropertyHelpers.ExtractReplicaName(x.Key), x => TagCollection.TryParse(x.Value, out var tags) ? tags : null)
-                .ToDictionary(x => x.Key, MergeTagCollections);
-        }
-
-        [NotNull]
-        public static TagCollection GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
-        {
-            var tagCollections = properties
-                .Where(x => TagPropertyHelpers.IsReplicaTagsPropertyKey(x.Key, replicaName))
-                .Select(x => TagCollection.TryParse(x.Value, out var tags) ? tags : null);
-
-            return MergeTagCollections(tagCollections);
+            var tags = properties.GetPersistentReplicaTags(replicaName);
+            var newTags = modifyTagsFunc?.Invoke(tags) ?? new TagCollection();
+            return properties.SetReplicaTags(replicaName, newTags);
         }
 
         [NotNull]
@@ -109,12 +114,31 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         private static string GetPersistentReplicaTagsPropertyKey(string replicaName)
             => TagPropertyHelpers.FormatName(replicaName, "persistent");
 
+        [NotNull]
+        private static IReadOnlyDictionary<T, TagCollection> GetTagsInternal<T>([NotNull] this IReadOnlyDictionary<string, string> properties, Func<string, T> parseReplicaFunc)
+        {
+            var tagList = new Dictionary<T, List<KeyValuePair<string, string>>>();
+            foreach (var property in properties)
+            {
+                var replica = parseReplicaFunc(property.Key);
+                if (replica == null)
+                    continue;
+                if (tagList.ContainsKey(replica))
+                    tagList[replica].Add(property);
+                else
+                    tagList.Add(replica, new List<KeyValuePair<string, string>>{property});
+            }
+
+            return tagList.ToDictionary(x => x.Key, x => MergeTagCollections(x.Value));
+        }
+        
         [Pure]
         [NotNull]
-        private static TagCollection MergeTagCollections([NotNull] IEnumerable<TagCollection> collections)
+        private static TagCollection MergeTagCollections([NotNull] IEnumerable<KeyValuePair<string, string>> collections)
         {
             return new TagCollection(
                 collections
+                    .Select(x => TagCollection.TryParse(x.Value, out var tags) ? tags : null)
                     .Where(x => x != null)
                     .SelectMany(x => x)
                     .ToDictionary(x => x.Key, x => x.Value)
