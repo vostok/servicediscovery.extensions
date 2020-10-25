@@ -56,27 +56,35 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         }
 
         [NotNull]
-        public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties) 
-            => properties.GetTagsInternal(TagPropertyHelpers.ExtractReplicaName);
+        public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties)
+            => properties.GetTagsInternal(
+                key => TagPropertyKey.TryParse(key, out var tagPropertyKey)
+                    ? (tagPropertyKey.ReplicaName, tagPropertyKey.TagKind)
+                    : (null, null));
 
         [NotNull]
         public static IReadOnlyDictionary<Uri, TagCollection> GetServiceTags([NotNull] this IReadOnlyDictionary<string, string> properties)
             => properties.GetTagsInternal(
-                key =>
-                {
-                    var replicaName = TagPropertyHelpers.ExtractReplicaName(key);
-                    return replicaName == null 
-                        ? null 
-                        : UrlParser.Parse(replicaName);
-                });
+                key => TagPropertyKey.TryParse(key, out var tagPropertyKey)
+                    ? (UrlParser.Parse(tagPropertyKey.ReplicaName), tagPropertyKey.TagKind)
+                    : (null, null));
 
         [NotNull]
         public static TagCollection GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
         {
-            var tagCollections = properties
-                .Where(x => TagPropertyHelpers.IsReplicaTagsPropertyKey(x.Key, replicaName));
+            var tagList = new Dictionary<string, TagCollection>();
+            foreach (var property in properties)
+            {
+                if (!TagPropertyKey.TryParse(property.Key, out var tagPropertyKey))
+                    continue;
+                if (tagPropertyKey.ReplicaName != replicaName)
+                    continue;
+                if (!TagCollection.TryParse(property.Value, out var tagCollection))
+                    continue;
+                tagList[tagPropertyKey.TagKind] = tagCollection;
+            }
 
-            return MergeTagCollections(tagCollections);
+            return MergeTagCollections(tagList);
         }
 
         [Pure]
@@ -88,12 +96,12 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         [NotNull]
         public static IApplicationInfoProperties RemoveReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, IEnumerable<string> tagKeysToRemove)
             => ModifyReplicaTags(properties, replicaName, tc => RemoveTags(tc, tagKeysToRemove));
-        
+
         [Pure]
         [NotNull]
         public static IApplicationInfoProperties ClearReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName)
             => properties.SetReplicaTags(replicaName, new TagCollection());
-        
+
         [Pure]
         [NotNull]
         public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
@@ -111,38 +119,45 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                 : new TagCollection();
 
         [NotNull]
-        private static string GetPersistentReplicaTagsPropertyKey(string replicaName)
-            => TagPropertyHelpers.FormatName(replicaName, "persistent");
-
-        [NotNull]
-        private static IReadOnlyDictionary<T, TagCollection> GetTagsInternal<T>([NotNull] this IReadOnlyDictionary<string, string> properties, Func<string, T> parseReplicaFunc)
+        private static IReadOnlyDictionary<T, TagCollection> GetTagsInternal<T>([NotNull] this IReadOnlyDictionary<string, string> properties, Func<string, (T, string)> parseReplicaFunc)
         {
-            var tagList = new Dictionary<T, List<KeyValuePair<string, string>>>();
+            var tagKindDictionary = new Dictionary<T, Dictionary<string, TagCollection>>();
             foreach (var property in properties)
             {
-                var replica = parseReplicaFunc(property.Key);
-                if (replica == null)
+                var (replica, kind) = parseReplicaFunc(property.Key);
+                if (replica == null || kind == null)
                     continue;
-                if (tagList.ContainsKey(replica))
-                    tagList[replica].Add(property);
-                else
-                    tagList.Add(replica, new List<KeyValuePair<string, string>>{property});
+                if (!TagCollection.TryParse(property.Value, out var tagCollection))
+                    continue;
+
+                if (!tagKindDictionary.ContainsKey(replica))
+                    tagKindDictionary.Add(replica, new Dictionary<string, TagCollection>());
+
+                tagKindDictionary[replica][kind] = tagCollection;
             }
 
-            return tagList.ToDictionary(x => x.Key, x => MergeTagCollections(x.Value));
+            return tagKindDictionary.ToDictionary(x => x.Key, x => MergeTagCollections(x.Value));
         }
-        
+
         [Pure]
         [NotNull]
-        private static TagCollection MergeTagCollections([NotNull] IEnumerable<KeyValuePair<string, string>> collections)
+        private static TagCollection MergeTagCollections([NotNull] Dictionary<string, TagCollection> kindCollectionPairs)
         {
-            return new TagCollection(
-                collections
-                    .Select(x => TagCollection.TryParse(x.Value, out var tags) ? tags : null)
-                    .Where(x => x != null)
-                    .SelectMany(x => x)
-                    .ToDictionary(x => x.Key, x => x.Value)
-            );
+            var tagCollection = new TagCollection();
+            var notPersistentTags = kindCollectionPairs
+                .Where(kindCollectionPair => kindCollectionPair.Key != PropertyConstants.PersistentTagKindKey)
+                .SelectMany(kindCollectionPair => kindCollectionPair.Value);
+
+            foreach (var tag in notPersistentTags)
+                tagCollection[tag.Key] = tag.Value;
+
+            if (kindCollectionPairs.ContainsKey(PropertyConstants.PersistentTagKindKey))
+            {
+                foreach (var tag in kindCollectionPairs[PropertyConstants.PersistentTagKindKey])
+                    tagCollection[tag.Key] = tag.Value;
+            }
+
+            return tagCollection;
         }
 
         private static TagCollection AddTags(TagCollection existingTags, TagCollection newTags)
@@ -162,5 +177,9 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                 existingTags.Remove(tagToRemove);
             return existingTags;
         }
+
+        [NotNull]
+        private static string GetPersistentReplicaTagsPropertyKey(string replicaName)
+            => new TagPropertyKey(replicaName, PropertyConstants.PersistentTagKindKey).ToString();
     }
 }

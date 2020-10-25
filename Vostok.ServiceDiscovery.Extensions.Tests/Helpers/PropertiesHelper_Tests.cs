@@ -311,6 +311,33 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             properties.GetTags().Should().BeEmpty();
         }
 
+        [Test]
+        public void GetTags_should_return_persistent_tags_in_first_priority()
+        {
+            IApplicationInfoProperties properties = new TestApplicationInfoProperties();
+            var replica = "replica";
+            var persistentTags = new TagCollection {{"tag4", "v1"}};
+            properties = properties.AddReplicaTags(replica, persistentTags);
+            var otherTags = new TagCollection {{"tag4", "v2"}, {"tag1", "v1"}};
+            properties = properties.Set(new TagPropertyKey(replica, "other").ToString(), otherTags.ToString());
+            properties.GetTags()
+                .Should()
+                .BeEquivalentTo(
+                    new Dictionary<string, TagCollection>
+                    {
+                        {replica, new TagCollection {{"tag4", "v1"}, {"tag1", "v1"}}}
+                    });
+            
+            properties = properties.RemoveReplicaTags(replica, new List<string> {"tag4"});
+            properties.GetTags()
+                .Should()
+                .BeEquivalentTo(
+                    new Dictionary<string, TagCollection>
+                    {
+                        {replica, otherTags}
+                    });
+        }
+
         public class TestApplicationInfoProperties : Dictionary<string, string>, IApplicationInfoProperties
         {
             public IApplicationInfoProperties Set(string key, string value)
