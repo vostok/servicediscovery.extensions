@@ -59,6 +59,6 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         [NotNull]
         private static string GetPersistentReplicaTagsPropertyKey([NotNull] string replicaName)
-            => TagPropertyHelpers.FormatName(replicaName, "persistent");
+            => new TagPropertyKey(replicaName, PropertyConstants.PersistentTagKindKey).ToString();
     }
 }
