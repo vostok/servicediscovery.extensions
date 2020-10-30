@@ -151,9 +151,9 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             foreach (var tag in notPersistentTags)
                 tagCollection[tag.Key] = tag.Value;
 
-            if (kindCollectionPairs.ContainsKey(PropertyConstants.PersistentTagKindKey))
+            if (kindCollectionPairs.TryGetValue(PropertyConstants.PersistentTagKindKey, out var persistentTags))
             {
-                foreach (var tag in kindCollectionPairs[PropertyConstants.PersistentTagKindKey])
+                foreach (var tag in persistentTags)
                     tagCollection[tag.Key] = tag.Value;
             }
 
