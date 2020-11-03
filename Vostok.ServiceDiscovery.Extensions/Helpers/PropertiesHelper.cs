@@ -72,19 +72,9 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         [NotNull]
         public static TagCollection GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
         {
-            var tagList = new Dictionary<string, TagCollection>();
-            foreach (var property in properties)
-            {
-                if (!TagPropertyKey.TryParse(property.Key, out var tagPropertyKey))
-                    continue;
-                if (tagPropertyKey.ReplicaName != replicaName)
-                    continue;
-                if (!TagCollection.TryParse(property.Value, out var tagCollection))
-                    continue;
-                tagList[tagPropertyKey.TagKind] = tagCollection;
-            }
-
-            return MergeTagCollections(tagList);
+            var persistentTags = properties.GetServiceKindTags(replicaName, PropertyConstants.PersistentTagKindKey);
+            var ephemeralTags = properties.GetServiceKindTags(replicaName, PropertyConstants.EphemeralTagKindKey);
+            return MergeTagCollections(ephemeralTags, persistentTags);
         }
 
         [Pure]
@@ -111,9 +101,17 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             return properties.SetReplicaTags(replicaName, newTags);
         }
 
+        [CanBeNull]
+        private static TagCollection GetServiceKindTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName, [NotNull] string kind) =>
+            properties.TryGetValue(new TagPropertyKey(replicaName, kind).ToString(), out var collectionString)
+                ? TagCollection.TryParse(collectionString, out var collection)
+                    ? collection
+                    : null
+                : null;
+
         [NotNull]
         private static TagCollection GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
-            => properties.TryGetValue(GetPersistentReplicaTagsPropertyKey(replicaName), out var value)
+            => properties.TryGetValue(new TagPropertyKey(replicaName, PropertyConstants.PersistentTagKindKey).ToString(), out var value)
                && TagCollection.TryParse(value, out var tagCollection)
                 ? tagCollection
                 : new TagCollection();
@@ -127,36 +125,35 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                 var (replica, kind) = parseReplicaFunc(property.Key);
                 if (replica == null || kind == null)
                     continue;
+                if (kind != PropertyConstants.EphemeralTagKindKey && kind != PropertyConstants.PersistentTagKindKey)
+                    continue;
                 if (!TagCollection.TryParse(property.Value, out var tagCollection))
                     continue;
-
                 if (!tagKindDictionary.ContainsKey(replica))
                     tagKindDictionary.Add(replica, new Dictionary<string, TagCollection>());
-
                 tagKindDictionary[replica][kind] = tagCollection;
             }
 
-            return tagKindDictionary.ToDictionary(x => x.Key, x => MergeTagCollections(x.Value));
+            return tagKindDictionary
+                .ToDictionary(
+                    x => x.Key,
+                    x => MergeTagCollections(
+                        x.Value.TryGetValue(PropertyConstants.EphemeralTagKindKey, out var ephemeralTags) ? ephemeralTags : null,
+                        x.Value.TryGetValue(PropertyConstants.PersistentTagKindKey, out var persistentTags) ? persistentTags : null
+                    ));
         }
 
         [Pure]
         [NotNull]
-        private static TagCollection MergeTagCollections([NotNull] Dictionary<string, TagCollection> kindCollectionPairs)
+        private static TagCollection MergeTagCollections([CanBeNull] TagCollection ephemeralTags, [CanBeNull] TagCollection persistentTags)
         {
+            if (ephemeralTags == null)
+                return persistentTags ?? new TagCollection();
+            if (persistentTags == null)
+                return ephemeralTags;
             var tagCollection = new TagCollection();
-            var notPersistentTags = kindCollectionPairs
-                .Where(kindCollectionPair => kindCollectionPair.Key != PropertyConstants.PersistentTagKindKey)
-                .SelectMany(kindCollectionPair => kindCollectionPair.Value);
-
-            foreach (var tag in notPersistentTags)
-                tagCollection[tag.Key] = tag.Value;
-
-            if (kindCollectionPairs.TryGetValue(PropertyConstants.PersistentTagKindKey, out var persistentTags))
-            {
-                foreach (var tag in persistentTags)
-                    tagCollection[tag.Key] = tag.Value;
-            }
-
+            foreach (var pair in ephemeralTags.Concat(persistentTags))
+                tagCollection[pair.Key] = pair.Value;
             return tagCollection;
         }
 
@@ -177,9 +174,5 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                 existingTags.Remove(tagToRemove);
             return existingTags;
         }
-
-        [NotNull]
-        private static string GetPersistentReplicaTagsPropertyKey(string replicaName)
-            => new TagPropertyKey(replicaName, PropertyConstants.PersistentTagKindKey).ToString();
     }
 }
