@@ -186,7 +186,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
                 {"tag5", "value3"},
                 "tag6"
             };
-            
+
             properties = properties.AddReplicaTags(replica1, replica1Tags);
             properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
             properties.GetReplicaTags(replica2).Should().BeEquivalentTo(new TagCollection());
@@ -201,7 +201,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
                     new Dictionary<string, TagCollection>
                     {
                         {replica1, replica1Tags},
-                        {replica2, replica2Tags},
+                        {replica2, replica2Tags}
                     });
 
             properties.GetServiceTags()
@@ -319,7 +319,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             var persistentTags = new TagCollection {{"tag4", "v1"}};
             properties = properties.AddReplicaTags(replica, persistentTags);
             var otherTags = new TagCollection {{"tag4", "v2"}, {"tag1", "v1"}};
-            properties = properties.Set(new TagPropertyKey(replica, "other").ToString(), otherTags.ToString());
+            properties = properties.Set(new TagPropertyKey(replica, PropertyConstants.EphemeralTagKindKey).ToString(), otherTags.ToString());
             properties.GetTags()
                 .Should()
                 .BeEquivalentTo(
@@ -327,15 +327,25 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
                     {
                         {replica, new TagCollection {{"tag4", "v1"}, {"tag1", "v1"}}}
                     });
-            
+
             properties = properties.RemoveReplicaTags(replica, new List<string> {"tag4"});
-            properties.GetTags()
-                .Should()
-                .BeEquivalentTo(
-                    new Dictionary<string, TagCollection>
-                    {
-                        {replica, otherTags}
-                    });
+            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica, otherTags}});
+        }
+
+        [Test]
+        public void GetTags_should_not_returns_not_valid_tag_kinds()
+        {
+            IApplicationInfoProperties properties = new TestApplicationInfoProperties();
+            var replica = "replica";
+            var otherTags = new TagCollection {{"tag4", "v1"}};
+            properties = properties.Set(new TagPropertyKey(replica, "other").ToString(), otherTags.ToString());
+            properties.GetTags().Should().BeEmpty();
+            properties.GetReplicaTags(replica).Should().BeEmpty();
+
+            var persistentTags = new TagCollection {{"tag", "value"}};
+            properties = properties.AddReplicaTags(replica, persistentTags);
+            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica, persistentTags}});
+            properties.GetReplicaTags(replica).Should().BeEquivalentTo(persistentTags);
         }
 
         public class TestApplicationInfoProperties : Dictionary<string, string>, IApplicationInfoProperties
