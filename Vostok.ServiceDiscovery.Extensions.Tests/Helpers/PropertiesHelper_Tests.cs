@@ -319,7 +319,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             var persistentTags = new TagCollection {{"tag4", "v1"}};
             properties = properties.AddReplicaTags(replica, persistentTags);
             var otherTags = new TagCollection {{"tag4", "v2"}, {"tag1", "v1"}};
-            properties = properties.Set(new TagPropertyKey(replica, PropertyConstants.EphemeralTagKindKey).ToString(), otherTags.ToString());
+            properties = properties.Set(new TagsPropertyKey(replica, PropertyConstants.EphemeralTagKindKey).ToString(), otherTags.ToString());
             properties.GetTags()
                 .Should()
                 .BeEquivalentTo(
@@ -338,7 +338,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             IApplicationInfoProperties properties = new TestApplicationInfoProperties();
             var replica = "replica";
             var otherTags = new TagCollection {{"tag4", "v1"}};
-            properties = properties.Set(new TagPropertyKey(replica, "other").ToString(), otherTags.ToString());
+            properties = properties.Set(new TagsPropertyKey(replica, "other").ToString(), otherTags.ToString());
             properties.GetTags().Should().BeEmpty();
             properties.GetReplicaTags(replica).Should().BeEmpty();
 
