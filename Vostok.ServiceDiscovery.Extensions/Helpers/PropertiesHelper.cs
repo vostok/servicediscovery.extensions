@@ -58,14 +58,14 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         [NotNull]
         public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IReadOnlyDictionary<string, string> properties)
             => properties.GetTagsInternal(
-                key => TagPropertyKey.TryParse(key, out var tagPropertyKey)
+                key => TagsPropertyKey.TryParse(key, out var tagPropertyKey)
                     ? (tagPropertyKey.ReplicaName, tagPropertyKey.TagKind)
                     : (null, null));
 
         [NotNull]
         public static IReadOnlyDictionary<Uri, TagCollection> GetServiceTags([NotNull] this IReadOnlyDictionary<string, string> properties)
             => properties.GetTagsInternal(
-                key => TagPropertyKey.TryParse(key, out var tagPropertyKey)
+                key => TagsPropertyKey.TryParse(key, out var tagPropertyKey)
                     ? (UrlParser.Parse(tagPropertyKey.ReplicaName), tagPropertyKey.TagKind)
                     : (null, null));
 
@@ -103,7 +103,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
 
         [CanBeNull]
         private static TagCollection GetServiceKindTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName, [NotNull] string kind) =>
-            properties.TryGetValue(new TagPropertyKey(replicaName, kind).ToString(), out var collectionString)
+            properties.TryGetValue(new TagsPropertyKey(replicaName, kind).ToString(), out var collectionString)
                 ? TagCollection.TryParse(collectionString, out var collection)
                     ? collection
                     : null
@@ -111,7 +111,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
 
         [NotNull]
         private static TagCollection GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
-            => properties.TryGetValue(new TagPropertyKey(replicaName, PropertyConstants.PersistentTagKindKey).ToString(), out var value)
+            => properties.TryGetValue(new TagsPropertyKey(replicaName, PropertyConstants.PersistentTagKindKey).ToString(), out var value)
                && TagCollection.TryParse(value, out var tagCollection)
                 ? tagCollection
                 : new TagCollection();
