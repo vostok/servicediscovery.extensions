@@ -22,10 +22,7 @@ namespace Vostok.ServiceDiscovery.Extensions.TagFilters
         public string Key { get; }
 
         /// <summary>
-        /// <para> Returns true if <see cref="NotContainsTagFilter.Key" /> is not present in <paramref name="collection" /> or
-        /// <paramref
-        ///     name="collection" />
-        /// is null. </para>
+        /// Returns true if <see cref="NotContainsTagFilter.Key" /> is not present in <paramref name="collection" /> or <paramref name="collection" /> is null.
         /// </summary>
         public bool Matches(TagCollection collection)
             => collection == null

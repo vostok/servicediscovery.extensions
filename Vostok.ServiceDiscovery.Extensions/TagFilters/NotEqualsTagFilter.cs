@@ -26,13 +26,7 @@ namespace Vostok.ServiceDiscovery.Extensions.TagFilters
         public string Key { get; }
 
         /// <summary>
-        /// <para> Returns true if <see cref="EqualsTagFilter.Key" /> is present in <paramref name="collection" /> and
-        /// <see
-        ///     cref="EqualsTagFilter.Value" />
-        /// not equals to <paramref name="collection" /> value by this
-        /// <see
-        ///     cref="EqualsTagFilter.Key" />
-        /// . </para>
+        /// Returns true if <see cref="EqualsTagFilter.Key" /> is present in <paramref name="collection" /> and <see cref="EqualsTagFilter.Value" /> not equals to <paramref name="collection" /> value by this <see cref="EqualsTagFilter.Key" />.
         /// </summary>
         public bool Matches(TagCollection collection)
             => collection != null
