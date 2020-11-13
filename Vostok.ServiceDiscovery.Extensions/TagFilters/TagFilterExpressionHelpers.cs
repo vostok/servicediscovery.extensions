@@ -8,6 +8,9 @@ namespace Vostok.ServiceDiscovery.Extensions.TagFilters
     {
         public static ITagFilter Parse(string input)
         {
+            if (string.IsNullOrWhiteSpace(input))
+                return null;
+            
             var equalsIndex = input.IndexOf("==", StringComparison.Ordinal);
             if (equalsIndex >= 0)
             {
