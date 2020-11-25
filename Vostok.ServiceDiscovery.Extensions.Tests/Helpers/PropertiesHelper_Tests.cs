@@ -348,6 +348,26 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             properties.GetReplicaTags(replica).Should().BeEquivalentTo(persistentTags);
         }
 
+        [Test]
+        public void GetServiceTags_should_ignore_all_remaining_matched_replica_properties()
+        {
+            IApplicationInfoProperties properties = new TestApplicationInfoProperties();
+            var replica1 = "http://replica.dev:2222";
+            var replica2 = "http://replica:2222";
+            var replica3 = "http://replica.dev.other:2222";
+            var replica1Tags = new TagCollection{"Tag1"};
+            var replica2Tags = new TagCollection{"Tag2", "Tag3"};
+            var replica3Tags = new TagCollection{"Tag3", "Tag4"};
+            
+            properties = properties
+                .AddReplicaTags(replica1, replica1Tags)
+                .AddReplicaTags(replica2, replica2Tags)
+                .AddReplicaTags(replica3, replica3Tags);
+            
+            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica1, replica1Tags}, {replica2, replica2Tags}, {replica3, replica3Tags}});
+            properties.GetServiceTags().Should().BeEquivalentTo(new Dictionary<Uri, TagCollection> {{new Uri(replica1), replica1Tags}});
+        }
+
         public class TestApplicationInfoProperties : Dictionary<string, string>, IApplicationInfoProperties
         {
             public IApplicationInfoProperties Set(string key, string value)
