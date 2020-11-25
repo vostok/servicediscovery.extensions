@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using Vostok.Commons.Helpers.Topology;
 using Vostok.Commons.Helpers.Url;
 using Vostok.ServiceDiscovery.Abstractions;
 using Vostok.ServiceDiscovery.Abstractions.Models;
@@ -67,7 +68,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             => properties.GetTagsInternal(
                 key => TagsPropertyKey.TryParse(key, out var tagPropertyKey)
                     ? (UrlParser.Parse(tagPropertyKey.ReplicaName), tagPropertyKey.TagKind)
-                    : (null, null));
+                    : (null, null),
+                ReplicaComparer.Instance);
 
         [NotNull]
         public static TagCollection GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
@@ -102,7 +104,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         }
 
         [CanBeNull]
-        private static TagCollection GetServiceKindTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName, [NotNull] string kind) =>
+        private static TagCollection GetServiceKindTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName, [NotNull] string kind) => 
             properties.TryGetValue(new TagsPropertyKey(replicaName, kind).ToString(), out var collectionString)
                 ? TagCollection.TryParse(collectionString, out var collection)
                     ? collection
@@ -117,9 +119,9 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                 : new TagCollection();
 
         [NotNull]
-        private static IReadOnlyDictionary<T, TagCollection> GetTagsInternal<T>([NotNull] this IReadOnlyDictionary<string, string> properties, Func<string, (T, string)> parseReplicaFunc)
+        private static IReadOnlyDictionary<T, TagCollection> GetTagsInternal<T>([NotNull] this IReadOnlyDictionary<string, string> properties, Func<string, (T, string)> parseReplicaFunc, IEqualityComparer<T> comparer = null)
         {
-            var tagKindDictionary = new Dictionary<T, Dictionary<string, TagCollection>>();
+            var tagKindDictionary = new Dictionary<T, Dictionary<string, TagCollection>>(comparer);
             foreach (var property in properties)
             {
                 var (replica, kind) = parseReplicaFunc(property.Key);
@@ -131,6 +133,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                     continue;
                 if (!tagKindDictionary.ContainsKey(replica))
                     tagKindDictionary.Add(replica, new Dictionary<string, TagCollection>());
+                if (tagKindDictionary[replica].ContainsKey(kind))
+                    continue;
                 tagKindDictionary[replica][kind] = tagCollection;
             }
 
@@ -139,8 +143,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                     x => x.Key,
                     x => MergeTagCollections(
                         x.Value.TryGetValue(PropertyConstants.EphemeralTagKindKey, out var ephemeralTags) ? ephemeralTags : null,
-                        x.Value.TryGetValue(PropertyConstants.PersistentTagKindKey, out var persistentTags) ? persistentTags : null
-                    ));
+                        x.Value.TryGetValue(PropertyConstants.PersistentTagKindKey, out var persistentTags) ? persistentTags : null),
+                    comparer);
         }
 
         [Pure]
