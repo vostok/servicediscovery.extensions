@@ -98,25 +98,18 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         [NotNull]
         public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
         {
-            var tags = properties.GetPersistentReplicaTags(replicaName);
-            var newTags = modifyTagsFunc?.Invoke(tags) ?? new TagCollection();
+            var tags = properties.GetServiceKindTags(replicaName, PropertyConstants.PersistentTagKindKey);
+            var newTags = modifyTagsFunc?.Invoke(tags ?? new TagCollection()) ?? new TagCollection();
             return properties.SetReplicaTags(replicaName, newTags);
         }
 
         [CanBeNull]
-        private static TagCollection GetServiceKindTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName, [NotNull] string kind) => 
-            properties.TryGetValue(new TagsPropertyKey(replicaName, kind).ToString(), out var collectionString)
+        private static TagCollection GetServiceKindTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName, [NotNull] string kind) 
+            => properties.TryGetValue(new TagsPropertyKey(replicaName, kind).ToString(), out var collectionString)
                 ? TagCollection.TryParse(collectionString, out var collection)
                     ? collection
                     : null
                 : null;
-
-        [NotNull]
-        private static TagCollection GetPersistentReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
-            => properties.TryGetValue(new TagsPropertyKey(replicaName, PropertyConstants.PersistentTagKindKey).ToString(), out var value)
-               && TagCollection.TryParse(value, out var tagCollection)
-                ? tagCollection
-                : new TagCollection();
 
         [NotNull]
         private static IReadOnlyDictionary<T, TagCollection> GetTagsInternal<T>([NotNull] this IReadOnlyDictionary<string, string> properties, Func<string, (T, string)> parseReplicaFunc, IEqualityComparer<T> comparer = null)
