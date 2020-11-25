@@ -318,18 +318,12 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             var replica = "replica";
             var persistentTags = new TagCollection {{"tag4", "v1"}};
             properties = properties.AddReplicaTags(replica, persistentTags);
-            var otherTags = new TagCollection {{"tag4", "v2"}, {"tag1", "v1"}};
-            properties = properties.Set(new TagsPropertyKey(replica, PropertyConstants.EphemeralTagKindKey).ToString(), otherTags.ToString());
-            properties.GetTags()
-                .Should()
-                .BeEquivalentTo(
-                    new Dictionary<string, TagCollection>
-                    {
-                        {replica, new TagCollection {{"tag4", "v1"}, {"tag1", "v1"}}}
-                    });
+            var ephemeralTags = new TagCollection {{"tag4", "v2"}, {"tag1", "v1"}};
+            properties = properties.Set(new TagsPropertyKey(replica, PropertyConstants.EphemeralTagKindKey).ToString(), ephemeralTags.ToString());
+            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica, new TagCollection {{"tag4", "v1"}, {"tag1", "v1"}}}});
 
             properties = properties.RemoveReplicaTags(replica, new List<string> {"tag4"});
-            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica, otherTags}});
+            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica, ephemeralTags}});
         }
 
         [Test]
