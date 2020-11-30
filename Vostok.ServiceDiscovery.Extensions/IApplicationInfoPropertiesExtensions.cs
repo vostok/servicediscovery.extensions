@@ -42,10 +42,13 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         [Pure]
         [NotNull]
-        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, [NotNull] TagCollection tags)
-            => tags?.Count > 0
-                ? properties.Set(GetPersistentReplicaTagsPropertyKey(replicaName), tags.ToString())
-                : properties.Remove(GetPersistentReplicaTagsPropertyKey(replicaName));
+        public static IApplicationInfoProperties SetPersistentReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, ReplicaTagKind replicaTagKind, TagCollection tags)
+            => properties.SetReplicaTags(replicaName, ReplicaTagKind.Persistent, tags);
+
+        [Pure]
+        [NotNull]
+        public static IApplicationInfoProperties SetEphemeralReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, ReplicaTagKind replicaTagKind, TagCollection tags)
+            => properties.SetReplicaTags(replicaName, ReplicaTagKind.Ephemeral, tags);
 
         [Pure]
         [NotNull]
@@ -56,9 +59,5 @@ namespace Vostok.ServiceDiscovery.Extensions
         [NotNull]
         public static IApplicationInfoProperties RemoveBlacklist([NotNull] this IApplicationInfoProperties properties)
             => properties.Remove(PropertyConstants.BlacklistProperty);
-
-        [NotNull]
-        private static string GetPersistentReplicaTagsPropertyKey([NotNull] string replicaName)
-            => new TagsPropertyKey(replicaName, PropertyConstants.PersistentTagKindKey).ToString();
     }
 }
