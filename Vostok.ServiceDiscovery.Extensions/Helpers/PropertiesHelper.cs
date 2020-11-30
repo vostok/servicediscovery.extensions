@@ -124,11 +124,12 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                     continue;
                 if (!TagCollection.TryParse(property.Value, out var tagCollection))
                     continue;
-                if (!tagKindDictionary.ContainsKey(replica))
-                    tagKindDictionary.Add(replica, new Dictionary<string, TagCollection>());
-                if (tagKindDictionary[replica].ContainsKey(kind))
-                    continue;
-                tagKindDictionary[replica][kind] = tagCollection;
+                
+                var replicaTags = tagKindDictionary.TryGetValue(replica, out var value)
+                    ? value
+                    : new Dictionary<string, TagCollection>();
+                replicaTags[kind] = tagCollection;
+                tagKindDictionary[replica] = replicaTags;
             }
 
             return tagKindDictionary

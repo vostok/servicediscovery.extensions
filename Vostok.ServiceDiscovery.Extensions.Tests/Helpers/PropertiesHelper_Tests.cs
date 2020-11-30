@@ -359,7 +359,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
                 .AddReplicaTags(replica3, replica3Tags);
             
             properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica1, replica1Tags}, {replica2, replica2Tags}, {replica3, replica3Tags}});
-            properties.GetServiceTags().Should().BeEquivalentTo(new Dictionary<Uri, TagCollection> {{new Uri(replica1), replica1Tags}});
+            properties.GetServiceTags().Should().BeEquivalentTo(new Dictionary<Uri, TagCollection> {{new Uri(replica1), replica3Tags}});
         }
 
         public class TestApplicationInfoProperties : Dictionary<string, string>, IApplicationInfoProperties
