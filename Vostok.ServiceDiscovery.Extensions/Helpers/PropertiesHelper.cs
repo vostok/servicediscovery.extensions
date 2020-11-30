@@ -46,6 +46,18 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         }
 
         [Pure]
+        public static IApplicationInfoProperties SetReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, ReplicaTagKind replicaTagKind, TagCollection tags)
+        {
+            var propertyKey = new TagsPropertyKey(replicaName, replicaTagKind.ToString());
+            if (properties.GetReplicaKindTags(propertyKey).Equals(tags))
+                return properties;
+
+            return tags?.Count > 0
+                ? properties.Set(propertyKey.ToString(), tags.ToString())
+                : properties.Remove(propertyKey.ToString());
+        }
+
+        [Pure]
         public static IApplicationInfoProperties RemoveFromBlacklist(this IApplicationInfoProperties properties, Uri[] replicasToRemove)
         {
             var blacklist = new HashSet<Uri>(properties.GetBlacklist());
@@ -74,60 +86,64 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         [NotNull]
         public static TagCollection GetReplicaTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName)
         {
-            var persistentTags = properties.GetServiceKindTags(replicaName, PropertyConstants.PersistentTagKindKey);
-            var ephemeralTags = properties.GetServiceKindTags(replicaName, PropertyConstants.EphemeralTagKindKey);
+            var persistentTags = properties.GetReplicaKindTags(new TagsPropertyKey(replicaName, ReplicaTagKind.Persistent.ToString()));
+            var ephemeralTags = properties.GetReplicaKindTags(new TagsPropertyKey(replicaName, ReplicaTagKind.Ephemeral.ToString()));
             return MergeTagCollections(ephemeralTags, persistentTags);
         }
 
         [Pure]
         [NotNull]
-        public static IApplicationInfoProperties AddReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, TagCollection tags)
-            => ModifyReplicaTags(properties, replicaName, tc => AddTags(tc, tags));
+        public static IApplicationInfoProperties AddReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, ReplicaTagKind replicaTagKind, TagCollection tags)
+            => ModifyReplicaTags(properties, replicaName, replicaTagKind, tc => AddTags(tc, tags));
 
         [Pure]
         [NotNull]
-        public static IApplicationInfoProperties RemoveReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, IEnumerable<string> tagKeysToRemove)
-            => ModifyReplicaTags(properties, replicaName, tc => RemoveTags(tc, tagKeysToRemove));
+        public static IApplicationInfoProperties RemoveReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, ReplicaTagKind replicaTagKind, IEnumerable<string> tagKeysToRemove)
+            => ModifyReplicaTags(properties, replicaName, replicaTagKind, tc => RemoveTags(tc, tagKeysToRemove));
 
         [Pure]
         [NotNull]
-        public static IApplicationInfoProperties ClearReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName)
-            => properties.SetReplicaTags(replicaName, new TagCollection());
+        public static IApplicationInfoProperties ClearReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, ReplicaTagKind replicaTagKind)
+            => properties.SetReplicaTags(replicaName, replicaTagKind, new TagCollection());
 
         [Pure]
         [NotNull]
-        public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
+        public static IApplicationInfoProperties ModifyReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, ReplicaTagKind replicaTagKind, Func<TagCollection, TagCollection> modifyTagsFunc)
         {
-            var tags = properties.GetServiceKindTags(replicaName, PropertyConstants.PersistentTagKindKey);
-            var newTags = modifyTagsFunc?.Invoke(tags ?? new TagCollection()) ?? new TagCollection();
-            return properties.SetReplicaTags(replicaName, newTags);
+            var tags = properties.GetReplicaKindTags(replicaName, replicaTagKind);
+            var newTags = modifyTagsFunc?.Invoke(tags) ?? new TagCollection();
+            return properties.SetReplicaTags(replicaName, replicaTagKind, newTags);
         }
 
-        [CanBeNull]
-        private static TagCollection GetServiceKindTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName, [NotNull] string kind) 
-            => properties.TryGetValue(new TagsPropertyKey(replicaName, kind).ToString(), out var collectionString)
+        [NotNull]
+        private static TagCollection GetReplicaKindTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] TagsPropertyKey tagsPropertyKey)
+            => properties.TryGetValue(tagsPropertyKey.ToString(), out var collectionString)
                 ? TagCollection.TryParse(collectionString, out var collection)
                     ? collection
-                    : null
-                : null;
+                    : new TagCollection()
+                : new TagCollection();
+
+        [NotNull]
+        private static TagCollection GetReplicaKindTags([NotNull] this IReadOnlyDictionary<string, string> properties, [NotNull] string replicaName, ReplicaTagKind replicaTagKind)
+            => properties.GetReplicaKindTags(new TagsPropertyKey(replicaName, replicaTagKind.ToString()));
 
         [NotNull]
         private static IReadOnlyDictionary<T, TagCollection> GetTagsInternal<T>([NotNull] this IReadOnlyDictionary<string, string> properties, Func<string, (T, string)> parseReplicaFunc, IEqualityComparer<T> comparer = null)
         {
-            var tagKindDictionary = new Dictionary<T, Dictionary<string, TagCollection>>(comparer);
+            var tagKindDictionary = new Dictionary<T, Dictionary<ReplicaTagKind, TagCollection>>(comparer);
             foreach (var property in properties)
             {
-                var (replica, kind) = parseReplicaFunc(property.Key);
-                if (replica == null || kind == null)
+                var (replica, kindString) = parseReplicaFunc(property.Key);
+                if (replica == null || kindString == null)
                     continue;
-                if (kind != PropertyConstants.EphemeralTagKindKey && kind != PropertyConstants.PersistentTagKindKey)
+                if (!Enum.TryParse<ReplicaTagKind>(kindString, out var kind))
                     continue;
                 if (!TagCollection.TryParse(property.Value, out var tagCollection))
                     continue;
-                
+
                 var replicaTags = tagKindDictionary.TryGetValue(replica, out var value)
                     ? value
-                    : new Dictionary<string, TagCollection>();
+                    : new Dictionary<ReplicaTagKind, TagCollection>();
                 replicaTags[kind] = tagCollection;
                 tagKindDictionary[replica] = replicaTags;
             }
@@ -136,8 +152,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
                 .ToDictionary(
                     x => x.Key,
                     x => MergeTagCollections(
-                        x.Value.TryGetValue(PropertyConstants.EphemeralTagKindKey, out var ephemeralTags) ? ephemeralTags : null,
-                        x.Value.TryGetValue(PropertyConstants.PersistentTagKindKey, out var persistentTags) ? persistentTags : null),
+                        x.Value.TryGetValue(ReplicaTagKind.Ephemeral, out var ephemeralTags) ? ephemeralTags : null,
+                        x.Value.TryGetValue(ReplicaTagKind.Persistent, out var persistentTags) ? persistentTags : null),
                     comparer);
         }
 

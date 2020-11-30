@@ -150,11 +150,11 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
                 {"tag5", "value3"},
                 "tag6"
             };
-            properties = properties.AddReplicaTags(replica1, replica1Tags);
+            properties = properties.AddReplicaTags(replica1, ReplicaTagKind.Persistent, replica1Tags);
             properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
             properties.GetReplicaTags(replica2).Should().BeEquivalentTo(new TagCollection());
 
-            properties = properties.AddReplicaTags(replica2, replica2Tags);
+            properties = properties.AddReplicaTags(replica2, ReplicaTagKind.Persistent, replica2Tags);
             properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
             properties.GetReplicaTags(replica2).Should().BeEquivalentTo(replica2Tags);
 
@@ -187,11 +187,11 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
                 "tag6"
             };
 
-            properties = properties.AddReplicaTags(replica1, replica1Tags);
+            properties = properties.AddReplicaTags(replica1, ReplicaTagKind.Persistent, replica1Tags);
             properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
             properties.GetReplicaTags(replica2).Should().BeEquivalentTo(new TagCollection());
 
-            properties = properties.AddReplicaTags(replica2, replica2Tags);
+            properties = properties.AddReplicaTags(replica2, ReplicaTagKind.Persistent, replica2Tags);
             properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
             properties.GetReplicaTags(replica2).Should().BeEquivalentTo(replica2Tags);
 
@@ -228,8 +228,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             {
                 {"tag1", "updatedValue"}
             };
-            var added = properties.AddReplicaTags(replica1, tagsToAdd);
-            var updated = added.AddReplicaTags(replica1, tagsToUpdate);
+            var added = properties.AddReplicaTags(replica1, ReplicaTagKind.Ephemeral, tagsToAdd);
+            var updated = added.AddReplicaTags(replica1, ReplicaTagKind.Ephemeral, tagsToUpdate);
             updated.GetReplicaTags(replica1).Should().BeEquivalentTo(new TagCollection {{"tag1", "updatedValue"}, {"tag2", "value1"}, "tag3"});
         }
 
@@ -251,9 +251,9 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
                 {"tag5", "value3"},
                 "tag6"
             };
-            properties = properties.AddReplicaTags(replica1, replica1Tags);
-            properties = properties.AddReplicaTags(replica2, replica2Tags);
-            properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag3", "tag1"});
+            properties = properties.AddReplicaTags(replica1, ReplicaTagKind.Persistent, replica1Tags);
+            properties = properties.AddReplicaTags(replica2, ReplicaTagKind.Persistent, replica2Tags);
+            properties = properties.RemoveReplicaTags(replica1, ReplicaTagKind.Persistent, new List<string> {"tag3", "tag1"});
             properties.GetReplicaTags(replica1).Should().BeEquivalentTo(new TagCollection {{"tag2", "value1"}});
             properties.GetReplicaTags(replica2).Should().BeEquivalentTo(replica2Tags);
         }
@@ -269,11 +269,11 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
                 {"tag2", "value1"},
                 "tag3"
             };
-            properties = properties.AddReplicaTags(replica1, replica1Tags);
-            properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag3", "tag1"});
+            properties = properties.AddReplicaTags(replica1, ReplicaTagKind.Ephemeral, replica1Tags);
+            properties = properties.RemoveReplicaTags(replica1, ReplicaTagKind.Ephemeral, new List<string> {"tag3", "tag1"});
             properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica1, new TagCollection {{"tag2", "value1"}}}});
 
-            properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag2"});
+            properties = properties.RemoveReplicaTags(replica1, ReplicaTagKind.Ephemeral, new List<string> {"tag2"});
             properties.GetTags().Should().BeEmpty();
         }
 
@@ -282,7 +282,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
         {
             IApplicationInfoProperties properties = new TestApplicationInfoProperties();
             var replica1 = "replica1";
-            properties = properties.RemoveReplicaTags(replica1, new List<string> {"tag1", "tag2"});
+            properties = properties.RemoveReplicaTags(replica1, ReplicaTagKind.Persistent, new List<string> {"tag1", "tag2"});
             properties.GetReplicaTags(replica1).Should().BeEmpty();
             properties.GetTags().Should().BeEmpty();
         }
@@ -293,8 +293,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             IApplicationInfoProperties properties = new TestApplicationInfoProperties();
             var replica = "replica";
             var replicaTags = new TagCollection {"tag4"};
-            properties = properties.AddReplicaTags(replica, replicaTags);
-            properties = properties.ModifyReplicaTags(replica, null);
+            properties = properties.AddReplicaTags(replica, ReplicaTagKind.Persistent, replicaTags);
+            properties = properties.ModifyReplicaTags(replica, ReplicaTagKind.Persistent, null);
             properties.GetReplicaTags(replica).Should().BeEmpty();
             properties.GetTags().Should().BeEmpty();
         }
@@ -305,8 +305,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             IApplicationInfoProperties properties = new TestApplicationInfoProperties();
             var replica = "replica";
             var replicaTags = new TagCollection {"tag4"};
-            properties = properties.AddReplicaTags(replica, replicaTags);
-            properties = properties.ModifyReplicaTags(replica, tags => null);
+            properties = properties.AddReplicaTags(replica, ReplicaTagKind.Persistent, replicaTags);
+            properties = properties.ModifyReplicaTags(replica, ReplicaTagKind.Persistent, tags => null);
             properties.GetReplicaTags(replica).Should().BeEmpty();
             properties.GetTags().Should().BeEmpty();
         }
@@ -317,13 +317,17 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             IApplicationInfoProperties properties = new TestApplicationInfoProperties();
             var replica = "replica";
             var persistentTags = new TagCollection {{"tag4", "v1"}};
-            properties = properties.AddReplicaTags(replica, persistentTags);
+            properties = properties.AddReplicaTags(replica, ReplicaTagKind.Persistent, persistentTags);
             var ephemeralTags = new TagCollection {{"tag4", "v2"}, {"tag1", "v1"}};
-            properties = properties.Set(new TagsPropertyKey(replica, PropertyConstants.EphemeralTagKindKey).ToString(), ephemeralTags.ToString());
-            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica, new TagCollection {{"tag4", "v1"}, {"tag1", "v1"}}}});
+            properties = properties.AddReplicaTags(replica, ReplicaTagKind.Ephemeral, ephemeralTags);
 
-            properties = properties.RemoveReplicaTags(replica, new List<string> {"tag4"});
+            var expected = new TagCollection {{"tag4", "v1"}, {"tag1", "v1"}};
+            properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica, new TagCollection {{"tag4", "v1"}, {"tag1", "v1"}}}});
+            properties.GetReplicaTags(replica).Should().BeEquivalentTo(expected);
+
+            properties = properties.RemoveReplicaTags(replica, ReplicaTagKind.Persistent, new List<string> {"tag4"});
             properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica, ephemeralTags}});
+            properties.GetReplicaTags(replica).Should().BeEquivalentTo(ephemeralTags);
         }
 
         [Test]
@@ -337,7 +341,7 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             properties.GetReplicaTags(replica).Should().BeEmpty();
 
             var persistentTags = new TagCollection {{"tag", "value"}};
-            properties = properties.AddReplicaTags(replica, persistentTags);
+            properties = properties.AddReplicaTags(replica, ReplicaTagKind.Persistent, persistentTags);
             properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica, persistentTags}});
             properties.GetReplicaTags(replica).Should().BeEquivalentTo(persistentTags);
         }
@@ -354,15 +358,55 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             var replica3Tags = new TagCollection{"Tag3", "Tag4"};
             
             properties = properties
-                .AddReplicaTags(replica1, replica1Tags)
-                .AddReplicaTags(replica2, replica2Tags)
-                .AddReplicaTags(replica3, replica3Tags);
+                .AddReplicaTags(replica1, ReplicaTagKind.Persistent, replica1Tags)
+                .AddReplicaTags(replica2, ReplicaTagKind.Persistent, replica2Tags)
+                .AddReplicaTags(replica3, ReplicaTagKind.Persistent, replica3Tags);
             
             properties.GetTags().Should().BeEquivalentTo(new Dictionary<string, TagCollection> {{replica1, replica1Tags}, {replica2, replica2Tags}, {replica3, replica3Tags}});
             properties.GetServiceTags().Should().BeEquivalentTo(new Dictionary<Uri, TagCollection> {{new Uri(replica1), replica3Tags}});
         }
 
-        public class TestApplicationInfoProperties : Dictionary<string, string>, IApplicationInfoProperties
+        [Test]
+        public void SetReplicaTags_and_all_its_uses_should_not_update_properties_when_tag_collection_does_not_changed()
+        {
+            IApplicationInfoProperties properties = new ImmutableTestApplicationInfoProperties();
+            var replicaName = "http://replica.dev:2222";
+            var emptyCollection = new TagCollection();
+            var initCollection = new TagCollection{"tag1"};
+            var newProperties = properties.SetReplicaTags(replicaName, ReplicaTagKind.Persistent, initCollection);
+            properties.Should().NotBeSameAs(newProperties);
+            newProperties.SetReplicaTags(replicaName, ReplicaTagKind.Persistent, initCollection).Should().BeSameAs(newProperties);
+
+            newProperties.ModifyReplicaTags(replicaName, ReplicaTagKind.Persistent, collection => new TagCollection {"tag1"}).Should().BeSameAs(newProperties);
+            newProperties.AddReplicaTags(replicaName, ReplicaTagKind.Persistent, emptyCollection).Should().BeSameAs(newProperties);
+            newProperties.RemoveReplicaTags(replicaName, ReplicaTagKind.Persistent, Array.Empty<string>()).Should().BeSameAs(newProperties);
+            properties.ClearReplicaTags(replicaName, ReplicaTagKind.Persistent).Should().BeSameAs(properties);
+        }
+        
+        private class ImmutableTestApplicationInfoProperties : Dictionary<string, string>, IApplicationInfoProperties
+        {
+            public ImmutableTestApplicationInfoProperties()
+                : base(new Dictionary<string, string>())
+            {}
+            
+            private ImmutableTestApplicationInfoProperties(Dictionary<string, string> dict)
+                : base(dict)
+            {}
+            
+            public IApplicationInfoProperties Set(string key, string value) 
+                => new ImmutableTestApplicationInfoProperties(new Dictionary<string, string>(this) {[key] = value});
+
+            IApplicationInfoProperties IApplicationInfoProperties.Remove(string key)
+            {
+                if (!ContainsKey(key))
+                    return this;
+                var dict = new Dictionary<string, string>(this);
+                dict.Remove(key);
+                return new ImmutableTestApplicationInfoProperties(new Dictionary<string, string>(dict));
+            }
+        }
+
+        private class TestApplicationInfoProperties : Dictionary<string, string>, IApplicationInfoProperties
         {
             public IApplicationInfoProperties Set(string key, string value)
             {
