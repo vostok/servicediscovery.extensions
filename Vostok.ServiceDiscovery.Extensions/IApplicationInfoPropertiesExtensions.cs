@@ -22,10 +22,16 @@ namespace Vostok.ServiceDiscovery.Extensions
         public static ReplicaWeights GetReplicaWeights([NotNull] this IApplicationInfoProperties properties)
             => PropertiesHelper.GetReplicaWeights(properties);
 
+        /// <summary>
+        /// todo
+        /// </summary>
         [NotNull]
         public static TagCollection GetReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName)
             => PropertiesHelper.GetReplicaTags(properties, replicaName);
 
+        /// <summary>
+        /// todo
+        /// </summary>
         [NotNull]
         public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IApplicationInfoProperties properties)
             => PropertiesHelper.GetTags(properties);
@@ -40,14 +46,20 @@ namespace Vostok.ServiceDiscovery.Extensions
         public static IApplicationInfoProperties SetBlacklist([NotNull] this IApplicationInfoProperties properties, [NotNull] IEnumerable<Uri> blacklist)
             => properties.Set(PropertyConstants.BlacklistProperty, string.Join(PropertyConstants.BlacklistItemSeparator, blacklist));
 
+        /// <summary>
+        /// todo
+        /// </summary>
         [Pure]
         [NotNull]
-        public static IApplicationInfoProperties SetPersistentReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, ReplicaTagKind replicaTagKind, TagCollection tags)
+        public static IApplicationInfoProperties SetPersistentReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, TagCollection tags)
             => properties.SetReplicaTags(replicaName, ReplicaTagKind.Persistent, tags);
 
+        /// <summary>
+        /// todo
+        /// </summary>
         [Pure]
         [NotNull]
-        public static IApplicationInfoProperties SetEphemeralReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, ReplicaTagKind replicaTagKind, TagCollection tags)
+        public static IApplicationInfoProperties SetEphemeralReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, TagCollection tags)
             => properties.SetReplicaTags(replicaName, ReplicaTagKind.Ephemeral, tags);
 
         [Pure]
