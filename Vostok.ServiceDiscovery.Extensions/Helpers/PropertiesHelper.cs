@@ -98,8 +98,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
 
         [Pure]
         [NotNull]
-        public static IApplicationInfoProperties RemoveReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, ReplicaTagKind replicaTagKind, IEnumerable<string> tagKeysToRemove)
-            => ModifyReplicaTags(properties, replicaName, replicaTagKind, tc => RemoveTags(tc, tagKeysToRemove));
+        public static IApplicationInfoProperties RemoveReplicaTags([NotNull] this IApplicationInfoProperties properties, string replicaName, ReplicaTagKind replicaTagKind, IEnumerable<string> tagKeys)
+            => ModifyReplicaTags(properties, replicaName, replicaTagKind, tc => RemoveTags(tc, tagKeys));
 
         [Pure]
         [NotNull]
@@ -180,11 +180,11 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             return existingTags;
         }
 
-        private static TagCollection RemoveTags(TagCollection existingTags, IEnumerable<string> tagKeysToRemove)
+        private static TagCollection RemoveTags(TagCollection existingTags, IEnumerable<string> tagKeys)
         {
-            if (tagKeysToRemove == null)
+            if (tagKeys == null)
                 return existingTags;
-            foreach (var tagToRemove in tagKeysToRemove)
+            foreach (var tagToRemove in tagKeys)
                 existingTags.Remove(tagToRemove);
             return existingTags;
         }
