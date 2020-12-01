@@ -23,14 +23,14 @@ namespace Vostok.ServiceDiscovery.Extensions
             => PropertiesHelper.GetReplicaWeights(properties);
 
         /// <summary>
-        /// todo
+        /// Returns <see cref="TagCollection"/> with all tag kinds by given <paramref name="replicaName"/>.
         /// </summary>
         [NotNull]
         public static TagCollection GetReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName)
             => PropertiesHelper.GetReplicaTags(properties, replicaName);
 
         /// <summary>
-        /// todo
+        /// Returns dictionary of <see cref="TagCollection"/> by application replicas with all tag kinds.
         /// </summary>
         [NotNull]
         public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IApplicationInfoProperties properties)
@@ -47,15 +47,17 @@ namespace Vostok.ServiceDiscovery.Extensions
             => properties.Set(PropertyConstants.BlacklistProperty, string.Join(PropertyConstants.BlacklistItemSeparator, blacklist));
 
         /// <summary>
-        /// todo
+        /// <para>Sets given <paramref name="tags"/> for given <paramref name="replicaName"/> to <see cref="IApplicationInfoProperties"/> and gives them <see cref="ReplicaTagKind.Persistent"/> kind.</para>
+        /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
         [Pure]
         [NotNull]
         public static IApplicationInfoProperties SetPersistentReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, TagCollection tags)
             => properties.SetReplicaTags(replicaName, ReplicaTagKind.Persistent, tags);
-
+        
         /// <summary>
-        /// todo
+        /// <para>Sets given <paramref name="tags"/> for given <paramref name="replicaName"/> to <see cref="IApplicationInfoProperties"/> and gives them <see cref="ReplicaTagKind.Ephemeral"/> kind.</para>
+        /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
         [Pure]
         [NotNull]
