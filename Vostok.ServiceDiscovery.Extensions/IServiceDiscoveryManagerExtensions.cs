@@ -35,5 +35,14 @@ namespace Vostok.ServiceDiscovery.Extensions
                     properties => properties.SetExternalUrl(externalUrl))
                 .ConfigureAwait(false);
         }
+
+        public static async Task<bool> RemoveExternalUrlAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application)
+        {
+            return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
+                    environment,
+                    application,
+                    properties => properties.RemoveExternalUrl())
+                .ConfigureAwait(false);
+        }
     }
 }
