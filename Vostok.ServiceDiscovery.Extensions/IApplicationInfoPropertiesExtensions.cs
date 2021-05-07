@@ -17,6 +17,10 @@ namespace Vostok.ServiceDiscovery.Extensions
         public static Uri[] GetBlacklist([NotNull] this IApplicationInfoProperties properties)
             => PropertiesHelper.GetBlacklist(properties);
 
+        [NotNull]
+        public static Uri[] GetDesiredTopology([NotNull] this IApplicationInfoProperties properties)
+            => PropertiesHelper.GetDesiredTopology(properties);
+
         [CanBeNull]
         public static ReplicaWeights GetReplicaWeights([NotNull] this IApplicationInfoProperties properties)
             => PropertiesHelper.GetReplicaWeights(properties);
@@ -33,6 +37,11 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         [Pure]
         [NotNull]
+        public static IApplicationInfoProperties SetDesiredTopology([NotNull] this IApplicationInfoProperties properties, [NotNull] IEnumerable<Uri> desiredTopology)
+            => properties.Set(PropertyConstants.DesiredTopologyProperty, string.Join(PropertyConstants.DesiredTopologyItemSeparator, desiredTopology));
+
+        [Pure]
+        [NotNull]
         public static IApplicationInfoProperties RemoveExternalUrl([NotNull] this IApplicationInfoProperties properties)
             => properties.Remove(PropertyConstants.ExternalUrlProperty);
 
@@ -40,5 +49,10 @@ namespace Vostok.ServiceDiscovery.Extensions
         [NotNull]
         public static IApplicationInfoProperties RemoveBlacklist([NotNull] this IApplicationInfoProperties properties)
             => properties.Remove(PropertyConstants.BlacklistProperty);
+
+        [Pure]
+        [NotNull]
+        public static IApplicationInfoProperties RemoveDesiredTopology([NotNull] this IApplicationInfoProperties properties)
+            => properties.Remove(PropertyConstants.DesiredTopologyProperty);
     }
 }
