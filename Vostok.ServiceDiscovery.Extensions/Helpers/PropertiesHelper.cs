@@ -17,9 +17,11 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
 
         [NotNull]
         public static Uri[] GetBlacklist([NotNull] this IReadOnlyDictionary<string, string> properties)
-            => properties.TryGetValue(PropertyConstants.BlacklistProperty, out var value)
-                ? UrlParser.Parse(value.Split(PropertyConstants.BlacklistItemSeparator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
-                : Array.Empty<Uri>();
+            => ExtractUrisList(properties, PropertyConstants.BlacklistProperty, PropertyConstants.BlacklistItemSeparator.ToCharArray());
+
+        [NotNull]
+        public static Uri[] GetDesiredTopology([NotNull] this IReadOnlyDictionary<string, string> properties)
+            => ExtractUrisList(properties, PropertyConstants.DesiredTopologyProperty, PropertyConstants.DesiredTopologyItemSeparator.ToCharArray());
 
         [CanBeNull]
         public static ReplicaWeights GetReplicaWeights([NotNull] this IReadOnlyDictionary<string, string> properties)
@@ -53,5 +55,10 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
             blacklist.ExceptWith(replicasToRemove);
             return properties.SetBlacklist(blacklist);
         }
+
+        private static Uri[] ExtractUrisList(IReadOnlyDictionary<string, string> properties, string propertyKey, char[] urisSeparator) =>
+            properties.TryGetValue(propertyKey, out var value)
+                ? UrlParser.Parse(value.Split(urisSeparator, StringSplitOptions.RemoveEmptyEntries))
+                : Array.Empty<Uri>();
     }
 }
