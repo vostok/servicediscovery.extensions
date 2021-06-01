@@ -17,7 +17,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
         public static async Task<bool> AddPersistentReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, TagCollection tags)
-            => await serviceDiscoveryManager.AddReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Persistent, tags);
+            => await serviceDiscoveryManager.AddReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Persistent, tags).ConfigureAwait(false);
 
         /// <summary>
         /// <para><inheritdoc cref="AddReplicaTagsAsync"/></para>
@@ -25,7 +25,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
         public static async Task<bool> AddEphemeralReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, TagCollection tags)
-            => await serviceDiscoveryManager.AddReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Ephemeral, tags);
+            => await serviceDiscoveryManager.AddReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Ephemeral, tags).ConfigureAwait(false);
 
         /// <summary>
         /// <para><inheritdoc cref="RemoveReplicaTagsAsync"/></para>
@@ -33,7 +33,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
         public static async Task<bool> RemovePersistentReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, IEnumerable<string> tagKeysToRemove)
-            => await serviceDiscoveryManager.RemoveReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Persistent, tagKeysToRemove);
+            => await serviceDiscoveryManager.RemoveReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Persistent, tagKeysToRemove).ConfigureAwait(false);
 
         /// <summary>
         /// <para><inheritdoc cref="RemoveReplicaTagsAsync"/></para>
@@ -41,7 +41,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
         public static async Task<bool> RemoveEphemeralReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, IEnumerable<string> tagKeysToRemove)
-            => await serviceDiscoveryManager.RemoveReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Ephemeral, tagKeysToRemove);
+            => await serviceDiscoveryManager.RemoveReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Ephemeral, tagKeysToRemove).ConfigureAwait(false);
 
         /// <summary>
         /// <para><inheritdoc cref="ClearReplicaTagsAsync"/></para>
@@ -49,7 +49,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
         public static async Task<bool> ClearPersistentReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, IEnumerable<string> tagKeysToRemove)
-            => await serviceDiscoveryManager.ClearReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Persistent);
+            => await serviceDiscoveryManager.ClearReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Persistent).ConfigureAwait(false);
 
         /// <summary>
         /// <para><inheritdoc cref="ClearReplicaTagsAsync"/></para>
@@ -57,7 +57,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
         public static async Task<bool> ClearEphemeralReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, IEnumerable<string> tagKeysToRemove)
-            => await serviceDiscoveryManager.ClearReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Ephemeral);
+            => await serviceDiscoveryManager.ClearReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Ephemeral).ConfigureAwait(false);
         
         /// <summary>
         /// <para><inheritdoc cref="ModifyReplicaTagsAsync"/></para>
@@ -65,7 +65,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
         public static async Task<bool> ModifyPersistentReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
-            => await serviceDiscoveryManager.ModifyReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Persistent, modifyTagsFunc);
+            => await serviceDiscoveryManager.ModifyReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Persistent, modifyTagsFunc).ConfigureAwait(false);
 
         /// <summary>
         /// <para><inheritdoc cref="ModifyReplicaTagsAsync"/></para>
@@ -73,7 +73,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
         public static async Task<bool> ModifyEphemeralReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, Func<TagCollection, TagCollection> modifyTagsFunc)
-            => await serviceDiscoveryManager.ModifyReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Ephemeral, modifyTagsFunc);
+            => await serviceDiscoveryManager.ModifyReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Ephemeral, modifyTagsFunc).ConfigureAwait(false);
 
         public static async Task<bool> AddToBlacklistAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params Uri[] replicasToAdd)
         {
