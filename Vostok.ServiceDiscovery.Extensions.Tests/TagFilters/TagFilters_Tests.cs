@@ -117,17 +117,17 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.TagFilters
         }
 
         [Test]
-        public void NotEqualsFilter_matches_should_return_false_when_collection_is_null()
+        public void NotEqualsFilter_matches_should_return_true_when_collection_is_null()
         {
             var filter = new NotEqualsTagFilter("tag", "value");
-            filter.Matches(null).Should().BeFalse();
+            filter.Matches(null).Should().BeTrue();
         }
 
         [Test]
-        public void NotEqualsFilter_matches_should_return_false_when_collection_has_no_key()
+        public void NotEqualsFilter_matches_should_return_true_when_collection_has_no_key()
         {
             var filter = new NotEqualsTagFilter("tag", "value");
-            filter.Matches(new TagCollection {"tag1", {"tag2", "value2"}}).Should().BeFalse();
+            filter.Matches(new TagCollection {"tag1", {"tag2", "value2"}}).Should().BeTrue();
         }
 
         [Test]
