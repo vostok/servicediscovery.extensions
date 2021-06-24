@@ -174,6 +174,8 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             IApplicationInfoProperties properties = new TestApplicationInfoProperties();
             var replica1 = "http://localhost:1234/";
             var replica2 = "replica2";
+            var replica3 = "replica3:1234";
+            var replica4 = "replica4:5678";
             var replica1Tags = new TagCollection
             {
                 {"tag1", "value1"},
@@ -186,6 +188,18 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
                 {"tag5", "value3"},
                 "tag6"
             };
+            var replica3Tags = new TagCollection
+            {
+                "tag7",
+                {"tag8", "value4"},
+                "tag9"
+            };
+            var replica4Tags = new TagCollection
+            {
+                "tag10",
+                {"tag11", "value5"},
+                "tag12"
+            };
 
             properties = properties.AddReplicaTags(replica1, ReplicaTagKind.Persistent, replica1Tags);
             properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
@@ -194,6 +208,12 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             properties = properties.AddReplicaTags(replica2, ReplicaTagKind.Persistent, replica2Tags);
             properties.GetReplicaTags(replica1).Should().BeEquivalentTo(replica1Tags);
             properties.GetReplicaTags(replica2).Should().BeEquivalentTo(replica2Tags);
+            
+            properties = properties.AddReplicaTags(replica3, ReplicaTagKind.Persistent, replica3Tags);
+            properties.GetReplicaTags(replica3).Should().BeEquivalentTo(replica3Tags);
+            
+            properties = properties.AddReplicaTags(replica4, ReplicaTagKind.Persistent, replica4Tags);
+            properties.GetReplicaTags(replica4).Should().BeEquivalentTo(replica4Tags);
 
             properties.GetTags()
                 .Should()
@@ -201,7 +221,9 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
                     new Dictionary<string, TagCollection>
                     {
                         {replica1, replica1Tags},
-                        {replica2, replica2Tags}
+                        {replica2, replica2Tags},
+                        {replica3, replica3Tags},
+                        {replica4, replica4Tags}
                     });
 
             properties.GetServiceTags()
