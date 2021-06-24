@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Vostok.ServiceDiscovery.Abstractions;
+using Vostok.ServiceDiscovery.Abstractions.Models;
 using Vostok.ServiceDiscovery.Extensions.Helpers;
 
 namespace Vostok.ServiceDiscovery.Extensions
@@ -21,6 +22,20 @@ namespace Vostok.ServiceDiscovery.Extensions
         public static ReplicaWeights GetReplicaWeights([NotNull] this IApplicationInfoProperties properties)
             => PropertiesHelper.GetReplicaWeights(properties);
 
+        /// <summary>
+        /// Returns <see cref="TagCollection"/> with all tag kinds by given <paramref name="replicaName"/>.
+        /// </summary>
+        [NotNull]
+        public static TagCollection GetReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName)
+            => PropertiesHelper.GetReplicaTags(properties, replicaName);
+
+        /// <summary>
+        /// Returns dictionary of <see cref="TagCollection"/> by application replicas with all tag kinds.
+        /// </summary>
+        [NotNull]
+        public static IReadOnlyDictionary<string, TagCollection> GetTags([NotNull] this IApplicationInfoProperties properties)
+            => PropertiesHelper.GetTags(properties);
+
         [Pure]
         [NotNull]
         public static IApplicationInfoProperties SetExternalUrl([NotNull] this IApplicationInfoProperties properties, [NotNull] Uri externalUrl)
@@ -30,6 +45,24 @@ namespace Vostok.ServiceDiscovery.Extensions
         [NotNull]
         public static IApplicationInfoProperties SetBlacklist([NotNull] this IApplicationInfoProperties properties, [NotNull] IEnumerable<Uri> blacklist)
             => properties.Set(PropertyConstants.BlacklistProperty, string.Join(PropertyConstants.BlacklistItemSeparator, blacklist));
+
+        /// <summary>
+        /// <para>Sets given <paramref name="tags"/> for given <paramref name="replicaName"/> to <see cref="IApplicationInfoProperties"/> and gives them <see cref="ReplicaTagKind.Persistent"/> kind.</para>
+        /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
+        /// </summary>
+        [Pure]
+        [NotNull]
+        public static IApplicationInfoProperties SetPersistentReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, TagCollection tags)
+            => properties.SetReplicaTags(replicaName, ReplicaTagKind.Persistent, tags);
+        
+        /// <summary>
+        /// <para>Sets given <paramref name="tags"/> for given <paramref name="replicaName"/> to <see cref="IApplicationInfoProperties"/> and gives them <see cref="ReplicaTagKind.Ephemeral"/> kind.</para>
+        /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
+        /// </summary>
+        [Pure]
+        [NotNull]
+        public static IApplicationInfoProperties SetEphemeralReplicaTags([NotNull] this IApplicationInfoProperties properties, [NotNull] string replicaName, TagCollection tags)
+            => properties.SetReplicaTags(replicaName, ReplicaTagKind.Ephemeral, tags);
 
         [Pure]
         [NotNull]
