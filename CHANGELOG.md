@@ -1,3 +1,8 @@
+## 0.1.6 (24-06-2021):
+
+Added extension methods for working with ApplicationNode tags.
+Added tag filter abstraction and realizations.
+
 ## 0.1.5 (20-04-2020):
 
 ReplicaComparer moved to Vostok.Commons.Helpers
