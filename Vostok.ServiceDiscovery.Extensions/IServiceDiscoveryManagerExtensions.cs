@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Vostok.ServiceDiscovery.Abstractions;
 using Vostok.ServiceDiscovery.Abstractions.Models;
 using Vostok.ServiceDiscovery.Extensions.Helpers;
+using Vostok.ServiceDiscovery.Telemetry;
+using Vostok.ServiceDiscovery.Telemetry.Event;
 
 namespace Vostok.ServiceDiscovery.Extensions
 {
@@ -77,6 +80,9 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         public static async Task<bool> AddToBlacklistAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params Uri[] replicasToAdd)
         {
+            ServiceDiscoveryEventDescriptionContext.GetOrCreate()
+                .SetEventKind(ServiceDiscoveryEventKind.AddToBlackList)
+                .AddReplicas(replicasToAdd.Select(uri => uri.ToString()).ToArray());
             return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
                     environment,
                     application,
@@ -86,6 +92,9 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         public static async Task<bool> RemoveFromBlacklistAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params Uri[] replicasToRemove)
         {
+            ServiceDiscoveryEventDescriptionContext.GetOrCreate()
+                .SetEventKind(ServiceDiscoveryEventKind.RemoveFromBlackList)
+                .AddReplicas(replicasToRemove.Select(uri => uri.ToString()).ToArray());
             return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
                     environment,
                     application,
