@@ -1,6 +1,6 @@
 # Vostok.ServiceDiscovery.Extensions
 
-[![Build status](https://ci.appveyor.com/api/projects/status/github/vostok/servicediscovery.extensions?svg=true&branch=master)](https://ci.appveyor.com/project/vostok/servicediscovery-extensions/branch/master)
+[![Build & Test & Publish](https://github.com/vostok/servicediscovery.extensions/actions/workflows/ci.yml/badge.svg)](https://github.com/vostok/servicediscovery.extensions/actions/workflows/ci.yml)
 [![NuGet](https://img.shields.io/nuget/v/Vostok.ServiceDiscovery.Extensions.svg)](https://www.nuget.org/packages/Vostok.ServiceDiscovery.Extensions)
 
 Extensions for reading and writing application associated data in service discovery system.
