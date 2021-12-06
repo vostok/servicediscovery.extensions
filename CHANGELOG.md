@@ -1,3 +1,7 @@
+## 0.1.7 (06-12-2021):
+
+Added `net6.0` target.
+
 ## 0.1.6 (24-06-2021):
 
 Added extension methods for working with ApplicationNode tags.
