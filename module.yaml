@@ -10,7 +10,7 @@ notests *default:
     - module vostok.servicediscovery.abstractions
 
   deps:
-    - vostok.servicediscovery.telemetry@initial_models
+    - vostok.servicediscovery.telemetry
     - vostok.servicediscovery.abstractions
     - vostok.devtools
     - vostok.commons.helpers/src

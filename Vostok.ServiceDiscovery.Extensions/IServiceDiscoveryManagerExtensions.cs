@@ -6,8 +6,8 @@ using JetBrains.Annotations;
 using Vostok.ServiceDiscovery.Abstractions;
 using Vostok.ServiceDiscovery.Abstractions.Models;
 using Vostok.ServiceDiscovery.Extensions.Helpers;
+using Vostok.ServiceDiscovery.Telemetry;
 using Vostok.ServiceDiscovery.Telemetry.Event;
-using Vostok.ServiceDiscovery.Telemetry.EventContext;
 
 namespace Vostok.ServiceDiscovery.Extensions
 {
@@ -80,8 +80,8 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         public static async Task<bool> AddToBlacklistAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params Uri[] replicasToAdd)
         {
-            using (new ServiceDiscoveryEventContextToken(builder =>
-                builder.SetEventKind(ServiceDiscoveryEventKind.ReplicaAddedToBlackList)
+            using (new ServiceDiscoveryEventsContextToken(builder =>
+                builder.SetKind(ServiceDiscoveryEventKind.ReplicaAddedToBlackList)
                     .AddReplicas(replicasToAdd.Select(uri => uri.ToString()).ToArray())))
             {
                 return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
@@ -94,8 +94,8 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         public static async Task<bool> RemoveFromBlacklistAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params Uri[] replicasToRemove)
         {
-            using (new ServiceDiscoveryEventContextToken(builder =>
-                builder.SetEventKind(ServiceDiscoveryEventKind.ReplicaRemovedFromBlacklist)
+            using (new ServiceDiscoveryEventsContextToken(builder =>
+                builder.SetKind(ServiceDiscoveryEventKind.ReplicaRemovedFromBlacklist)
                     .AddReplicas(replicasToRemove.Select(uri => uri.ToString()).ToArray())))
             {
                 return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
