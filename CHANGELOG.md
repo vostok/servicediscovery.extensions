@@ -1,3 +1,7 @@
+## 0.1.9 (11-01-2022):
+
+Added service discovery blacklist events setup.
+
 ## 0.1.8 (06-12-2021):
 
 Added `net6.0` target.
