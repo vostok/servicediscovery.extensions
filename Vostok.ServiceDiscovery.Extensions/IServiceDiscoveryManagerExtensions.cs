@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Vostok.ServiceDiscovery.Abstractions;
 using Vostok.ServiceDiscovery.Abstractions.Models;
 using Vostok.ServiceDiscovery.Extensions.Helpers;
+using Vostok.ServiceDiscovery.Telemetry;
+using Vostok.ServiceDiscovery.Telemetry.Event;
 
 namespace Vostok.ServiceDiscovery.Extensions
 {
@@ -58,7 +61,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// </summary>
         public static async Task<bool> ClearEphemeralReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, IEnumerable<string> tagKeysToRemove)
             => await serviceDiscoveryManager.ClearReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Ephemeral).ConfigureAwait(false);
-        
+
         /// <summary>
         /// <para><inheritdoc cref="ModifyReplicaTagsAsync"/></para>
         /// <para>This method modifies <see cref="ReplicaTagKind.Persistent"/> tags.</para>
@@ -77,20 +80,30 @@ namespace Vostok.ServiceDiscovery.Extensions
 
         public static async Task<bool> AddToBlacklistAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params Uri[] replicasToAdd)
         {
-            return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
-                    environment,
-                    application,
-                    properties => properties.AddToBlacklist(replicasToAdd))
-                .ConfigureAwait(false);
+            using (new ServiceDiscoveryEventsContextToken(builder =>
+                builder.SetKind(ServiceDiscoveryEventKind.ReplicaAddedToBlackList)
+                    .AddReplicas(replicasToAdd.Select(uri => uri.ToString()).ToArray())))
+            {
+                return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
+                        environment,
+                        application,
+                        properties => properties.AddToBlacklist(replicasToAdd))
+                    .ConfigureAwait(false);
+            }
         }
 
         public static async Task<bool> RemoveFromBlacklistAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params Uri[] replicasToRemove)
         {
-            return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
-                    environment,
-                    application,
-                    properties => properties.RemoveFromBlacklist(replicasToRemove))
-                .ConfigureAwait(false);
+            using (new ServiceDiscoveryEventsContextToken(builder =>
+                builder.SetKind(ServiceDiscoveryEventKind.ReplicaRemovedFromBlacklist)
+                    .AddReplicas(replicasToRemove.Select(uri => uri.ToString()).ToArray())))
+            {
+                return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
+                        environment,
+                        application,
+                        properties => properties.RemoveFromBlacklist(replicasToRemove))
+                    .ConfigureAwait(false);
+            }
         }
 
         public static async Task<bool> SetExternalUrlAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, Uri externalUrl)
@@ -101,7 +114,7 @@ namespace Vostok.ServiceDiscovery.Extensions
                     properties => properties.SetExternalUrl(externalUrl))
                 .ConfigureAwait(false);
         }
-        
+
         /// <summary>
         /// Add given <paramref name="tags"/> by <paramref name="replicaName"/> to the <see cref="IApplicationInfoProperties"/> of the given <paramref name="application"/> and updates it in ServiceDiscovery.
         /// </summary>
@@ -149,8 +162,8 @@ namespace Vostok.ServiceDiscovery.Extensions
                     properties => properties.ModifyReplicaTags(replicaName, replicaTagKind, modifyTagsFunc))
                 .ConfigureAwait(false);
         }
-		
-		public static async Task<bool> RemoveExternalUrlAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application)
+
+        public static async Task<bool> RemoveExternalUrlAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application)
         {
             return await serviceDiscoveryManager.TryUpdateApplicationPropertiesAsync(
                     environment,
