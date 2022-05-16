@@ -404,6 +404,42 @@ namespace Vostok.ServiceDiscovery.Extensions.Tests.Helpers
             newProperties.RemoveReplicaTags(replicaName, ReplicaTagKind.Persistent, Array.Empty<string>()).Should().BeSameAs(newProperties);
             properties.ClearReplicaTags(replicaName, ReplicaTagKind.Persistent).Should().BeSameAs(properties);
         }
+
+        [Test]
+        public void GetHostingTopology_should_return_an_empty_array_when_there_is_no_property()
+        {
+            var properties = new TestApplicationInfoProperties();
+
+            properties.GetHostingTopology().Should().BeEmpty();
+        }
+
+        [Test]
+        public void SetHostingTopology_should_properly_update_corresponding_property()
+        {
+            var properties = new TestApplicationInfoProperties() as IApplicationInfoProperties;
+
+            var replicas1 = new[]
+            {
+                new Uri("http://replica:1/vostok"),
+                new Uri("http://replica:2/vostok"),
+                new Uri("http://replica:3/vostok")
+            };
+            
+            var replicas2 = new[]
+            {
+                new Uri("http://replica:4/vostok"),
+                new Uri("http://replica:5/vostok"),
+                new Uri("http://replica:6/vostok")
+            };
+
+            properties = properties.SetHostingTopology(replicas1);
+
+            properties.GetHostingTopology().Should().Equal(replicas1);
+
+            properties = properties.SetHostingTopology(replicas2);
+
+            properties.GetHostingTopology().Should().Equal(replicas2);
+        }
         
         private class ImmutableTestApplicationInfoProperties : Dictionary<string, string>, IApplicationInfoProperties
         {

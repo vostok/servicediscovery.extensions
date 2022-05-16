@@ -18,6 +18,10 @@ namespace Vostok.ServiceDiscovery.Extensions
         public static Uri[] GetBlacklist([NotNull] this IServiceTopologyProperties properties)
             => PropertiesHelper.GetBlacklist(properties);
 
+        [NotNull]
+        public static Uri[] GetHostingTopology([NotNull] this IServiceTopologyProperties properties)
+            => PropertiesHelper.GetHostingTopology(properties);
+
         [CanBeNull]
         public static ReplicaWeights GetReplicaWeights([NotNull] this IServiceTopologyProperties properties)
             => PropertiesHelper.GetReplicaWeights(properties);
