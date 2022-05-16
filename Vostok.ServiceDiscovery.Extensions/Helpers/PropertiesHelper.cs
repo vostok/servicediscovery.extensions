@@ -20,7 +20,13 @@ namespace Vostok.ServiceDiscovery.Extensions.Helpers
         [NotNull]
         public static Uri[] GetBlacklist([NotNull] this IReadOnlyDictionary<string, string> properties)
             => properties.TryGetValue(PropertyConstants.BlacklistProperty, out var value)
-                ? UrlParser.Parse(value.Split(PropertyConstants.BlacklistItemSeparator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
+                ? UrlParser.Parse(value.Split(PropertyConstants.UriListSeparator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
+                : Array.Empty<Uri>();
+
+        [NotNull]
+        public static Uri[] GetHostingTopology([NotNull] this IReadOnlyDictionary<string, string> properties)
+            => properties.TryGetValue(PropertyConstants.HostingTopologyProperty, out var value)
+                ? UrlParser.Parse(value.Split(PropertyConstants.UriListSeparator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
                 : Array.Empty<Uri>();
 
         [CanBeNull]

@@ -18,6 +18,10 @@ namespace Vostok.ServiceDiscovery.Extensions
         public static Uri[] GetBlacklist([NotNull] this IApplicationInfoProperties properties)
             => PropertiesHelper.GetBlacklist(properties);
 
+        [NotNull]
+        public static Uri[] GetHostingTopology([NotNull] this IApplicationInfoProperties properties)
+            => PropertiesHelper.GetHostingTopology(properties);
+
         [CanBeNull]
         public static ReplicaWeights GetReplicaWeights([NotNull] this IApplicationInfoProperties properties)
             => PropertiesHelper.GetReplicaWeights(properties);
@@ -44,7 +48,12 @@ namespace Vostok.ServiceDiscovery.Extensions
         [Pure]
         [NotNull]
         public static IApplicationInfoProperties SetBlacklist([NotNull] this IApplicationInfoProperties properties, [NotNull] IEnumerable<Uri> blacklist)
-            => properties.Set(PropertyConstants.BlacklistProperty, string.Join(PropertyConstants.BlacklistItemSeparator, blacklist));
+            => properties.Set(PropertyConstants.BlacklistProperty, string.Join(PropertyConstants.UriListSeparator, blacklist));
+
+        [Pure]
+        [NotNull]
+        public static IApplicationInfoProperties SetHostingTopology([NotNull] this IApplicationInfoProperties properties, [NotNull] IEnumerable<Uri> hostingTopology)
+            => properties.Set(PropertyConstants.HostingTopologyProperty, string.Join(PropertyConstants.UriListSeparator, hostingTopology));
 
         /// <summary>
         /// <para>Sets given <paramref name="tags"/> for given <paramref name="replicaName"/> to <see cref="IApplicationInfoProperties"/> and gives them <see cref="ReplicaTagKind.Persistent"/> kind.</para>
