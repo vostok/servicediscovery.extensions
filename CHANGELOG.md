@@ -1,3 +1,7 @@
+## 0.1.10 (29-05-2022):
+
+Added `HostingTopology` extension property.
+
 ## 0.1.9 (11-01-2022):
 
 Added service discovery blacklist events setup.
