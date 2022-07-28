@@ -1,0 +1,66 @@
+override Vostok.ServiceDiscovery.Extensions.TagFilters.ContainsTagFilter.ToString() -> string
+override Vostok.ServiceDiscovery.Extensions.TagFilters.EqualsTagFilter.ToString() -> string
+override Vostok.ServiceDiscovery.Extensions.TagFilters.NotContainsTagFilter.ToString() -> string
+override Vostok.ServiceDiscovery.Extensions.TagFilters.NotEqualsTagFilter.ToString() -> string
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.GetBlacklist(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> System.Uri[]
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.GetExternalUrl(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> System.Uri
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.GetHostingTopology(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> System.Uri[]
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.GetReplicaTags(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties, string replicaName) -> Vostok.ServiceDiscovery.Abstractions.Models.TagCollection
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.GetReplicaWeights(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> Vostok.ServiceDiscovery.Extensions.ReplicaWeights
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.GetTags(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> System.Collections.Generic.IReadOnlyDictionary<string, Vostok.ServiceDiscovery.Abstractions.Models.TagCollection>
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.RemoveBlacklist(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.RemoveExternalUrl(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.SetBlacklist(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties, System.Collections.Generic.IEnumerable<System.Uri> blacklist) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.SetEphemeralReplicaTags(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties, string replicaName, Vostok.ServiceDiscovery.Abstractions.Models.TagCollection tags) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.SetExternalUrl(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties, System.Uri externalUrl) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.SetHostingTopology(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties, System.Collections.Generic.IEnumerable<System.Uri> hostingTopology) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.SetPersistentReplicaTags(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties, string replicaName, Vostok.ServiceDiscovery.Abstractions.Models.TagCollection tags) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.AddEphemeralReplicaTagsAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, Vostok.ServiceDiscovery.Abstractions.Models.TagCollection tags) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.AddPersistentReplicaTagsAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, Vostok.ServiceDiscovery.Abstractions.Models.TagCollection tags) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.AddToBlacklistAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params System.Uri[] replicasToAdd) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.ClearEphemeralReplicaTagsAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, System.Collections.Generic.IEnumerable<string> tagKeysToRemove) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.ClearPersistentReplicaTagsAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, System.Collections.Generic.IEnumerable<string> tagKeysToRemove) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.ModifyEphemeralReplicaTagsAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, System.Func<Vostok.ServiceDiscovery.Abstractions.Models.TagCollection, Vostok.ServiceDiscovery.Abstractions.Models.TagCollection> modifyTagsFunc) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.ModifyPersistentReplicaTagsAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, System.Func<Vostok.ServiceDiscovery.Abstractions.Models.TagCollection, Vostok.ServiceDiscovery.Abstractions.Models.TagCollection> modifyTagsFunc) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.RemoveEphemeralReplicaTagsAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, System.Collections.Generic.IEnumerable<string> tagKeysToRemove) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.RemoveExternalUrlAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.RemoveFromBlacklistAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, params System.Uri[] replicasToRemove) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.RemovePersistentReplicaTagsAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, System.Collections.Generic.IEnumerable<string> tagKeysToRemove) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions.SetExternalUrlAsync(this Vostok.ServiceDiscovery.Abstractions.IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, System.Uri externalUrl) -> System.Threading.Tasks.Task<bool>
+static Vostok.ServiceDiscovery.Extensions.IServiceTopologyPropertiesExtensions.GetBlacklist(this Vostok.ServiceDiscovery.Abstractions.IServiceTopologyProperties properties) -> System.Uri[]
+static Vostok.ServiceDiscovery.Extensions.IServiceTopologyPropertiesExtensions.GetExternalUrl(this Vostok.ServiceDiscovery.Abstractions.IServiceTopologyProperties properties) -> System.Uri
+static Vostok.ServiceDiscovery.Extensions.IServiceTopologyPropertiesExtensions.GetHostingTopology(this Vostok.ServiceDiscovery.Abstractions.IServiceTopologyProperties properties) -> System.Uri[]
+static Vostok.ServiceDiscovery.Extensions.IServiceTopologyPropertiesExtensions.GetReplicaTags(this Vostok.ServiceDiscovery.Abstractions.IServiceTopologyProperties properties, System.Uri replicaUrl) -> Vostok.ServiceDiscovery.Abstractions.Models.TagCollection
+static Vostok.ServiceDiscovery.Extensions.IServiceTopologyPropertiesExtensions.GetReplicaWeights(this Vostok.ServiceDiscovery.Abstractions.IServiceTopologyProperties properties) -> Vostok.ServiceDiscovery.Extensions.ReplicaWeights
+static Vostok.ServiceDiscovery.Extensions.IServiceTopologyPropertiesExtensions.GetTags(this Vostok.ServiceDiscovery.Abstractions.IServiceTopologyProperties properties) -> System.Collections.Generic.IReadOnlyDictionary<System.Uri, Vostok.ServiceDiscovery.Abstractions.Models.TagCollection>
+static Vostok.ServiceDiscovery.Extensions.TagFilters.TagFilterExpressionHelpers.Parse(string input) -> Vostok.ServiceDiscovery.Extensions.TagFilters.ITagFilter
+Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions
+Vostok.ServiceDiscovery.Extensions.IServiceDiscoveryManagerExtensions
+Vostok.ServiceDiscovery.Extensions.IServiceTopologyPropertiesExtensions
+Vostok.ServiceDiscovery.Extensions.ReplicaWeight
+Vostok.ServiceDiscovery.Extensions.ReplicaWeight.ReplicaWeight(double value, System.DateTime timestamp) -> void
+Vostok.ServiceDiscovery.Extensions.ReplicaWeight.Timestamp.get -> System.DateTime
+Vostok.ServiceDiscovery.Extensions.ReplicaWeight.Value.get -> double
+Vostok.ServiceDiscovery.Extensions.ReplicaWeights
+Vostok.ServiceDiscovery.Extensions.ReplicaWeights.ReplicaWeights(int capacity = 4) -> void
+Vostok.ServiceDiscovery.Extensions.TagFilters.ContainsTagFilter
+Vostok.ServiceDiscovery.Extensions.TagFilters.ContainsTagFilter.ContainsTagFilter(string key) -> void
+Vostok.ServiceDiscovery.Extensions.TagFilters.ContainsTagFilter.Key.get -> string
+Vostok.ServiceDiscovery.Extensions.TagFilters.ContainsTagFilter.Matches(Vostok.ServiceDiscovery.Abstractions.Models.TagCollection collection) -> bool
+Vostok.ServiceDiscovery.Extensions.TagFilters.EqualsTagFilter
+Vostok.ServiceDiscovery.Extensions.TagFilters.EqualsTagFilter.EqualsTagFilter(string key, string value) -> void
+Vostok.ServiceDiscovery.Extensions.TagFilters.EqualsTagFilter.Key.get -> string
+Vostok.ServiceDiscovery.Extensions.TagFilters.EqualsTagFilter.Matches(Vostok.ServiceDiscovery.Abstractions.Models.TagCollection collection) -> bool
+Vostok.ServiceDiscovery.Extensions.TagFilters.EqualsTagFilter.Value.get -> string
+Vostok.ServiceDiscovery.Extensions.TagFilters.ITagFilter
+Vostok.ServiceDiscovery.Extensions.TagFilters.ITagFilter.Matches(Vostok.ServiceDiscovery.Abstractions.Models.TagCollection collection) -> bool
+Vostok.ServiceDiscovery.Extensions.TagFilters.NotContainsTagFilter
+Vostok.ServiceDiscovery.Extensions.TagFilters.NotContainsTagFilter.Key.get -> string
+Vostok.ServiceDiscovery.Extensions.TagFilters.NotContainsTagFilter.Matches(Vostok.ServiceDiscovery.Abstractions.Models.TagCollection collection) -> bool
+Vostok.ServiceDiscovery.Extensions.TagFilters.NotContainsTagFilter.NotContainsTagFilter(string key) -> void
+Vostok.ServiceDiscovery.Extensions.TagFilters.NotEqualsTagFilter
+Vostok.ServiceDiscovery.Extensions.TagFilters.NotEqualsTagFilter.Key.get -> string
+Vostok.ServiceDiscovery.Extensions.TagFilters.NotEqualsTagFilter.Matches(Vostok.ServiceDiscovery.Abstractions.Models.TagCollection collection) -> bool
+Vostok.ServiceDiscovery.Extensions.TagFilters.NotEqualsTagFilter.NotEqualsTagFilter(string key, string value) -> void
+Vostok.ServiceDiscovery.Extensions.TagFilters.NotEqualsTagFilter.Value.get -> string
+Vostok.ServiceDiscovery.Extensions.TagFilters.TagFilterExpressionHelpers
