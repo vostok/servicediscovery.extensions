@@ -1,0 +1,1 @@
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.RemoveHostingTopology(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
