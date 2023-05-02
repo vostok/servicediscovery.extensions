@@ -1,4 +1,4 @@
-override Vostok.ServiceDiscovery.Extensions.TagFilters.ContainsTagFilter.ToString() -> string
+﻿override Vostok.ServiceDiscovery.Extensions.TagFilters.ContainsTagFilter.ToString() -> string
 override Vostok.ServiceDiscovery.Extensions.TagFilters.EqualsTagFilter.ToString() -> string
 override Vostok.ServiceDiscovery.Extensions.TagFilters.NotContainsTagFilter.ToString() -> string
 override Vostok.ServiceDiscovery.Extensions.TagFilters.NotEqualsTagFilter.ToString() -> string
@@ -10,6 +10,7 @@ static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.G
 static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.GetTags(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> System.Collections.Generic.IReadOnlyDictionary<string, Vostok.ServiceDiscovery.Abstractions.Models.TagCollection>
 static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.RemoveBlacklist(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
 static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.RemoveExternalUrl(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
+static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.RemoveHostingTopology(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
 static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.SetBlacklist(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties, System.Collections.Generic.IEnumerable<System.Uri> blacklist) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
 static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.SetEphemeralReplicaTags(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties, string replicaName, Vostok.ServiceDiscovery.Abstractions.Models.TagCollection tags) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
 static Vostok.ServiceDiscovery.Extensions.IApplicationInfoPropertiesExtensions.SetExternalUrl(this Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties properties, System.Uri externalUrl) -> Vostok.ServiceDiscovery.Abstractions.IApplicationInfoProperties
