@@ -1,3 +1,7 @@
+## 0.1.11 (02-05-2023):
+
+Added method to remove `HostingTopology` property.
+
 ## 0.1.10 (29-05-2022):
 
 Added `HostingTopology` extension property.
