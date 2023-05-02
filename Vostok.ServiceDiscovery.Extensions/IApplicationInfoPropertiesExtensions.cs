@@ -82,5 +82,10 @@ namespace Vostok.ServiceDiscovery.Extensions
         [NotNull]
         public static IApplicationInfoProperties RemoveBlacklist([NotNull] this IApplicationInfoProperties properties)
             => properties.Remove(PropertyConstants.BlacklistProperty);
+        
+        [Pure]
+        [NotNull]
+        public static IApplicationInfoProperties RemoveHostingTopology([NotNull] this IApplicationInfoProperties properties)
+            => properties.Remove(PropertyConstants.HostingTopologyProperty);
     }
 }
