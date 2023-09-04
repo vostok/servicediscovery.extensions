@@ -51,7 +51,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// <para>This method modifies <see cref="ReplicaTagKind.Persistent"/> tags.</para>
         /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
-        [Obsolete("This method is obsolete, because it's signature is incorrect. Use this method without tagKeysToRemove instead.", false)]
+        [Obsolete("This method is obsolete, because its signature is incorrect. Use this method without tagKeysToRemove instead.", false)]
         public static async Task<bool> ClearPersistentReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, IEnumerable<string> tagKeysToRemove)
             => await serviceDiscoveryManager.ClearReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Persistent).ConfigureAwait(false);
 
@@ -68,7 +68,7 @@ namespace Vostok.ServiceDiscovery.Extensions
         /// <para>This method modifies <see cref="ReplicaTagKind.Ephemeral"/> tags.</para>
         /// <para>See <see cref="ReplicaTagKind"/> for more information about different tags kinds.</para>
         /// </summary>
-        [Obsolete("This method is obsolete, because it's signature is incorrect. Use this method without tagKeysToRemove instead.", false)]
+        [Obsolete("This method is obsolete, because its signature is incorrect. Use this method without tagKeysToRemove instead.", false)]
         public static async Task<bool> ClearEphemeralReplicaTagsAsync(this IServiceDiscoveryManager serviceDiscoveryManager, string environment, string application, string replicaName, IEnumerable<string> tagKeysToRemove)
             => await serviceDiscoveryManager.ClearReplicaTagsAsync(environment, application, replicaName, ReplicaTagKind.Ephemeral).ConfigureAwait(false);
         
