@@ -1,3 +1,7 @@
+## 0.1.12 (12-09-2023):
+
+Signature methods for clearing replica tags are obsolete.
+
 ## 0.1.11 (02-05-2023):
 
 Added method to remove `HostingTopology` property.
