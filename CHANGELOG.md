@@ -1,3 +1,7 @@
+## 0.1.13 (12-12-2024): 
+
+Bump NuGet deps versions
+
 ## 0.1.12 (12-09-2023):
 
 Signature methods for clearing replica tags are obsolete.
